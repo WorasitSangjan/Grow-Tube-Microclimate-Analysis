@@ -2,10 +2,6 @@
 
 Repository for the research paper: **"Grow Tubes During Dormancy: Modeling Thermal Protection vs. Risk in Vineyard Microclimates"**
 
-## Description
-
-This repository contains the complete analytical workflow for studying the thermal effects of different grow tube materials and installation configurations on grapevine microclimates during dormancy periods. The study was conducted at Washington State University's Irrigated Agriculture Research and Extension Center (WSU-IAREC) in Prosser, WA.
-
 ## Key Features
 
 - **Temperature Data Processing**: Tools for handling HOBO Pro v2 logger data and weather station integration
