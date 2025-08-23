@@ -1,3 +1,6 @@
+# Author: Worasit Sangjan
+# Date: July 7, 2025
+
 # ============================================================================
 # BACK-TRANSFORMATION FOR CUBE ROOT TRANSFORMED LMM RESULTS
 # Converts transformed results back to original temperature scale (°C)
