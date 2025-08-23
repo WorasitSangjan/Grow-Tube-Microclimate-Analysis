@@ -17,7 +17,7 @@ Repository for the research paper: **"Grow Tubes During Dormancy: Modeling Therm
 
 ## Installation
 - **Low**: 
-- **Raise**: 
+- **Raise**: Grow tube is installed over the soil approximately 10 cm.
 
 ## Key Results
 
