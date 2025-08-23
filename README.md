@@ -44,12 +44,7 @@ Repository for the research paper: **"Grow Tubes During Dormancy: Modeling Therm
 If you use this code or data, please cite:
 
 ```bibtex
-@article{sangjan2025growtube,
-  title={Grow Tubes During Dormancy: Modeling Thermal Protection vs. Risk in Vineyard Microclimates},
-  author={Sangjan, Worasit and Rippner, Devin A. and Gillispie, Elizabeth C. and Schrader, Mark Jake and Shaw, Madison and Moyer, Michelle M.},
-  journal={[Journal Name]},
-  year={2025},
-  publisher={[Publisher]}
+Coming Soon!
 }
 ```
 
