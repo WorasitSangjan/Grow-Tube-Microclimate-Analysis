@@ -1,3 +1,6 @@
+# Author: Worasit Sangjan
+# Date: July 7, 2025
+
 # ============================================================================
 # LINEAR MIXED-EFFECTS MODEL ANALYSIS FOR GROW TUBE TEMPERATURE EFFECTS
 # Analysis of delta_Tn (tube temperature - no-tube control temperature)
