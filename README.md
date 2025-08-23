@@ -60,7 +60,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - USDA-ARS Horticultural Crops Production and Genetic Improvement Research Unit
-- Washington State University Irrigated Agriculture Research and Extension Center
 - Washington Soil Health Initiative Research Vineyard
 
 ---
