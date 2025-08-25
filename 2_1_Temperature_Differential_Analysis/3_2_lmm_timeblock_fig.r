@@ -1,3 +1,6 @@
+# Author: Worasit Sangjan
+# Date: July 3, 2025
+
 # ============================================================================
 # FIGURE GENERATION: Temperature Effects by Time Block
 # Creates publication-ready figure from LMM analysis results
