@@ -48,19 +48,19 @@ Coming Soon!
 }
 ```
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Contact
 
 - **Corresponding Author**: Devin A. Rippner (devin.rippner@usda.gov)
-- **Lead Author**: Worasit Sangjan
+- **Lead Author**: Worasit Sangjan (worasitsangjan.ws@gmail.com)
 
 ## Acknowledgments
 
 - USDA-ARS Horticultural Crops Production and Genetic Improvement Research Unit
 - Washington Soil Health Initiative Research Vineyard
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
