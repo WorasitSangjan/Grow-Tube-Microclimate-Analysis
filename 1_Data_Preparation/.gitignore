@@ -1,0 +1,11 @@
+# Generated data files
+*.csv
+hobo_data_imputed_complete.csv
+merged_data_*.csv
+
+# Python cache
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store
