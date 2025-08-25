@@ -17,7 +17,7 @@ Repository for the research paper: **"Grow Tubes During Dormancy: Modeling Therm
 
 ## Installation
 - **Low**: 
-- **Raise**: 
+- **Raise**: Grow tube is installed over the soil approximately 10 cm.
 
 ## Key Results
 
@@ -44,12 +44,7 @@ Repository for the research paper: **"Grow Tubes During Dormancy: Modeling Therm
 If you use this code or data, please cite:
 
 ```bibtex
-@article{sangjan2025growtube,
-  title={Grow Tubes During Dormancy: Modeling Thermal Protection vs. Risk in Vineyard Microclimates},
-  author={Sangjan, Worasit and Rippner, Devin A. and Gillispie, Elizabeth C. and Schrader, Mark Jake and Shaw, Madison and Moyer, Michelle M.},
-  journal={[Journal Name]},
-  year={2025},
-  publisher={[Publisher]}
+Coming Soon!
 }
 ```
 
@@ -65,7 +60,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - USDA-ARS Horticultural Crops Production and Genetic Improvement Research Unit
-- Washington State University Irrigated Agriculture Research and Extension Center
 - Washington Soil Health Initiative Research Vineyard
 
 ---

@@ -1,3 +1,7 @@
+# Author: Worasit Sangjan
+# Date: July 9, 2025
+
+
 # ============================================================================
 # FIGURE GENERATION: Temperature Effects by Thermal Phase
 # Creates publication-ready figure from LMM analysis results
