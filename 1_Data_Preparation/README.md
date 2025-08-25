@@ -17,7 +17,7 @@ The data preparation workflow consists of three main steps:
 
 **Key Features**:
 - Loads HOBO data with MM/DD/YY H:MM timestamp format
-- Creates complete 5-minute grid with fuzzy timestamp matching
+- Creates a complete 5-minute grid with fuzzy timestamp matching
 - Imputes missing values using replicate means within treatment groups
 - Generates validation plots showing original vs imputed data
 
@@ -40,9 +40,9 @@ python 1_hobo_data_imputation.py
 
 **Key Features**:
 - Aligns HOBO and weather data to common 15-minute bins
-- Handles timestamp misalignment with ±7.5 minute tolerance
+- Handles timestamp misalignment with ±7.5-minute tolerance
 - Aggregates HOBO data by treatment and replicate
-- Selects closest weather records for each time bin
+- Selects the closest weather records for each time bin
 
 **Input**: 
 - HOBO data: `hobo_data_Year_complete.csv`
@@ -89,7 +89,7 @@ python 3_data_preview_fig.py
 
 The data preparation pipeline produces high-quality temperature datasets ready for analysis:
 
-![Temperature Data Example](path/to/image.png)
+![Temperature Data Example](https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/1_Data_Preparation/images/img.png)
 
 *Temperature patterns for Plastic Low and Plastic Raise treatments showing grow tube effects from October 2024 to March 2025. Individual replicates (colored lines) track closely with some treatment-specific differences, while ambient air temperature (dashed black line) provides reference conditions.*
 
@@ -102,7 +102,7 @@ Raw HOBO Data
        ↓
 1. Data Imputation
    - Handle missing values
-   - Create 5-minute grid
+   - Create a 5-minute grid
    - Cross-replicate imputation
        ↓
 Complete HOBO Data
@@ -120,21 +120,12 @@ Merged Dataset
    - Temporal patterns
 ```
 
-## Treatment Mappings
-
-The scripts handle the following treatment combinations:
-
-| Code | Description |
-|------|-------------|
-| Paper_low | Paper Low |
-| Paper_raise | Paper Raise |
-| Plastic_low | Plastic Low |
-| Plastic_raise | Plastic Raise |
-| Uncover_uncover | No-Tube (Control) |
-
 ## Requirements
 
-```python
+**Python Version:**
+- Python >= 3.8
+
+```
 pandas>=1.3.0
 numpy>=1.21.0
 matplotlib>=3.4.0
