@@ -1,3 +1,6 @@
+# Author: Worasit Sangjan
+# Date: July 13, 2025
+
 # ============================================================================
 # FIGURE GENERATION: Temperature Effects Heatmap
 # Creates publication-ready heatmap from LMM analysis results
