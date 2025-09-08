@@ -1,15 +1,15 @@
 # Author: Worasit Sangjan
-# Date: July 7, 2025
+# Date: September 5, 2025
+# Version 2
 
 # ============================================================================
 # LINEAR MIXED-EFFECTS MODEL ANALYSIS FOR GROW TUBE TEMPERATURE EFFECTS
 # Analysis of delta_Ta (tube temperature - air temperature)
 # 
-# WORKFLOW:
-# 1. Data preparation
-# 2. Normality assessment and transformation selection
-# 3. Three modeling approaches using selected data
-# 4. Model comparison and results
+# This script performs comprehensive LMM analysis with:
+# 1. Unified transformation assessment for optimal model selection
+# 2. Three modeling approaches with comprehensive diagnostics
+# 3. Combined results output 
 # ============================================================================
 
 # Load required libraries
@@ -17,18 +17,17 @@ library(lme4)
 library(emmeans)
 library(car)
 library(multcomp)
+library(dplyr)
 
 # ============================================================================
-# STEP 1: DATA LOADING AND PREPARATION
+# DATA PREPARATION
 # ============================================================================
 
-# Load data
+cat("=== LOADING AND PREPARING DATA ===\n")
+
+# Load data and remove control group
 df <- read.csv("grow_tube_categorized.csv")
-cat("Original dataset:", nrow(df), "observations\n")
-
-# Remove control group
 df <- df[df$Material != "Uncover", ]
-cat("After removing control:", nrow(df), "observations\n")
 
 # Create factor variables
 df$treatment <- as.factor(paste(df$Material, df$Condition, sep="_"))
@@ -37,14 +36,14 @@ df$date_factor <- as.factor(df$date)
 df$thermal_phase <- as.factor(df$thermal_phase)
 df$time_block <- as.factor(df$time_block)
 
-# Check data
-cat("delta_Ta range:", range(df$delta_Ta, na.rm = TRUE), "\n")
-cat("Missing values in delta_Ta:", sum(is.na(df$delta_Ta)), "\n")
-cat("Treatments:", levels(df$treatment), "\n")
+cat("Dataset:", nrow(df), "observations\n")
+cat("Treatments:", paste(levels(df$treatment), collapse = ", "), "\n")
 
 # ============================================================================
-# STEP 2: NORMALITY ASSESSMENT AND DATA TRANSFORMATION SELECTION
+# TRANSFORMATION ASSESSMENT (UNIFIED DATASET APPROACH)
 # ============================================================================
+
+cat("\n=== TRANSFORMATION ASSESSMENT ===\n")
 
 # Model control parameters
 control_opts <- lmerControl(
@@ -55,212 +54,199 @@ control_opts <- lmerControl(
   check.nobs.vs.rankZ = "ignore"
 )
 
-# Test Model A: Original scale
+# Calculate shift value for log/sqrt transformations
+min_val <- min(df$delta_Ta, na.rm = TRUE)
+shift_val <- abs(min_val) + 0.01
+
+# Create all transformation variables
+df$delta_Ta_log <- log(df$delta_Ta + shift_val)
+df$delta_Ta_sqrt <- sqrt(df$delta_Ta + shift_val)
+df$delta_Ta_cbrt <- sign(df$delta_Ta) * abs(df$delta_Ta)^(1/3)
+
+# Test all transformations using unified model structure
 model_original <- lmer(delta_Ta ~ treatment * thermal_phase + (1|tube_id) + (1|date_factor), 
                        data = df, REML = FALSE, control = control_opts)
+model_log <- lmer(delta_Ta_log ~ treatment * thermal_phase + (1|tube_id) + (1|date_factor), 
+                  data = df, REML = FALSE, control = control_opts)
+model_sqrt <- lmer(delta_Ta_sqrt ~ treatment * thermal_phase + (1|tube_id) + (1|date_factor), 
+                   data = df, REML = FALSE, control = control_opts)
+model_cbrt <- lmer(delta_Ta_cbrt ~ treatment * thermal_phase + (1|tube_id) + (1|date_factor), 
+                   data = df, REML = FALSE, control = control_opts)
 
-# Create residual diagnostic plots for original model
-png("residuals_original_delta_Ta.png", width = 3600, height = 1200, res = 250)
-par(mfrow = c(1, 3), 
-    mar = c(5, 5, 4, 2),
-    cex.main = 2.5,
-    cex.lab = 2.2,
-    cex.axis = 1.9,
-    font.main = 2,
-    font.lab = 2,
-    lwd = 2)
+# Test normality for all transformations
+test_normality <- function(model) {
+  residuals_sample <- sample(resid(model), min(5000, length(resid(model))))
+  shapiro_test <- shapiro.test(residuals_sample)
+  return(list(p_value = shapiro_test$p.value, statistic = shapiro_test$statistic))
+}
 
-plot(fitted(model_original), resid(model_original), 
-     main = "Residuals vs Fitted", 
-     xlab = "Fitted Values", ylab = "Residuals",
-     pch = 16, cex = 0.8)
-abline(h = 0, col = "red", lwd = 3)
+norm_orig <- test_normality(model_original)
+norm_log <- test_normality(model_log)
+norm_sqrt <- test_normality(model_sqrt)
+norm_cbrt <- test_normality(model_cbrt)
 
-qqnorm(resid(model_original), main = "Normal Q-Q Plot",
-       pch = 16, cex = 0.8)
-qqline(resid(model_original), col = "red", lwd = 3)
+# Create transformation comparison table
+transformation_summary <- data.frame(
+  Transformation = c("Original", "Log", "SQRT", "CBRT"),
+  AIC = c(AIC(model_original), AIC(model_log), AIC(model_sqrt), AIC(model_cbrt)),
+  Shapiro_P = c(norm_orig$p_value, norm_log$p_value, norm_sqrt$p_value, norm_cbrt$p_value),
+  Shapiro_W = c(norm_orig$statistic, norm_log$statistic, norm_sqrt$statistic, norm_cbrt$statistic)
+)
 
-hist(resid(model_original), breaks = 50, 
-     main = "Residuals Distribution", 
-     xlab = "Residuals", col = "lightblue")
-dev.off()
+cat("Transformation comparison:\n")
+print(transformation_summary)
 
-# Test normality of original model residuals
-residuals_orig <- sample(resid(model_original), min(5000, length(resid(model_original))))
-shapiro_orig <- shapiro.test(residuals_orig)
-cat("Original model AIC:", round(AIC(model_original), 2), "\n")
-cat("Original model Shapiro p-value:", format.pval(shapiro_orig$p.value), "\n")
+# Select transformation with lowest AIC
+best_aic_idx <- which.min(transformation_summary$AIC)
+best_transformation <- transformation_summary$Transformation[best_aic_idx]
 
-# Test Model B: Cube root transformed scale
-df$delta_Ta_trans <- sign(df$delta_Ta) * abs(df$delta_Ta)^(1/3)
-
-model_transformed <- lmer(delta_Ta_trans ~ treatment * thermal_phase + (1|tube_id) + (1|date_factor), 
-                          data = df, REML = FALSE, control = control_opts)
-
-# Create residual diagnostic plots for transformed model
-png("residuals_transformed_delta_Ta.png", width = 3600, height = 1200, res = 250)
-par(mfrow = c(1, 3), 
-    mar = c(5, 5, 4, 2),
-    cex.main = 2.5,
-    cex.lab = 2.2,
-    cex.axis = 1.9,
-    font.main = 2,
-    font.lab = 2,
-    lwd = 2)
-
-plot(fitted(model_transformed), resid(model_transformed), 
-     main = "Residuals vs Fitted", 
-     xlab = "Fitted Values", ylab = "Residuals",
-     pch = 16, cex = 0.8)
-abline(h = 0, col = "red", lwd = 3)
-
-qqnorm(resid(model_transformed), main = "Normal Q-Q Plot",
-       pch = 16, cex = 0.8)
-qqline(resid(model_transformed), col = "red", lwd = 3)
-
-hist(resid(model_transformed), breaks = 50, 
-     main = "Residuals Distribution", 
-     xlab = "Residuals", col = "lightgreen")
-dev.off()
-
-# Test normality of transformed model residuals
-residuals_trans <- sample(resid(model_transformed), min(5000, length(resid(model_transformed))))
-shapiro_trans <- shapiro.test(residuals_trans)
-cat("Transformed model AIC:", round(AIC(model_transformed), 2), "\n")
-cat("Transformed model Shapiro p-value:", format.pval(shapiro_trans$p.value), "\n")
-
-# DECISION: Select the best data transformation
-cat("\n=== DATA TRANSFORMATION SELECTION ===\n")
-cat("Original model     - AIC:", round(AIC(model_original), 2), "| Shapiro p-value:", format.pval(shapiro_orig$p.value), "\n")
-cat("Transformed model  - AIC:", round(AIC(model_transformed), 2), "| Shapiro p-value:", format.pval(shapiro_trans$p.value), "\n")
-
-# Selection criteria: prefer normality, then AIC
-if(shapiro_trans$p.value > shapiro_orig$p.value && shapiro_trans$p.value > 0.001) {
-  selected_variable <- "delta_Ta_trans"
-  selected_description <- "cube root transformed delta_Ta"
-  cat("*** SELECTED: Transformed data (better normality) ***\n")
-} else if(shapiro_orig$p.value > 0.05) {
+if(best_transformation == "Original") {
   selected_variable <- "delta_Ta"
   selected_description <- "original delta_Ta"
-  cat("*** SELECTED: Original data (adequate normality) ***\n")
-} else {
-  if(AIC(model_transformed) < AIC(model_original)) {
-    selected_variable <- "delta_Ta_trans"
-    selected_description <- "cube root transformed delta_Ta"
-    cat("*** SELECTED: Transformed data (lower AIC) ***\n")
-  } else {
-    selected_variable <- "delta_Ta"
-    selected_description <- "original delta_Ta"
-    cat("*** SELECTED: Original data (lower AIC) ***\n")
-  }
+  selected_model <- model_original
+} else if(best_transformation == "Log") {
+  selected_variable <- "delta_Ta_log"
+  selected_description <- "log transformed delta_Ta"
+  selected_model <- model_log
+} else if(best_transformation == "SQRT") {
+  selected_variable <- "delta_Ta_sqrt"
+  selected_description <- "square root transformed delta_Ta"
+  selected_model <- model_sqrt
+} else if(best_transformation == "CBRT") {
+  selected_variable <- "delta_Ta_cbrt"
+  selected_description <- "cube root transformed delta_Ta"
+  selected_model <- model_cbrt
 }
 
-# ============================================================================
-# STEP 3: THREE MODELING APPROACHES USING SELECTED DATA
-# ============================================================================
-
-# Build the model formula using selected variable
-model_formula_1 <- as.formula(paste(selected_variable, "~ treatment * thermal_phase + (1|tube_id) + (1|date_factor)"))
-model_formula_2 <- as.formula(paste(selected_variable, "~ treatment * time_block + (1|tube_id) + (1|date_factor)"))
-model_formula_3 <- as.formula(paste(selected_variable, "~ treatment * thermal_phase * time_block + (1|tube_id) + (1|date_factor)"))
+cat("*** SELECTED:", best_transformation, "transformation (lowest AIC =", round(min(transformation_summary$AIC), 2), ") ***\n")
 
 # ============================================================================
-# MODEL 1: TREATMENT × THERMAL_PHASE
+# DIAGNOSTIC PLOTS
 # ============================================================================
 
-cat("\n=== MODEL 1: TREATMENT x THERMAL_PHASE ===\n")
-model_1 <- lmer(model_formula_1, data = df, REML = FALSE, control = control_opts)
-cat("Model 1 AIC:", round(AIC(model_1), 2), "\n")
+# Original data diagnostics
+png("Diagnostic_Plots_Original_vs_Selected.png", width = 3600, height = 2400, res = 250)
+par(mfrow = c(2, 3), 
+    mar = c(5, 5, 4, 2),
+    cex.main = 1.8,
+    cex.lab = 1.5,
+    cex.axis = 1.3,
+    font.main = 2,
+    font.lab = 2)
 
-anova_1 <- Anova(model_1, type = "III")
-print(anova_1)
+# Original data plots
+plot(fitted(model_original), resid(model_original), 
+     main = "Residuals vs Fitted (Original)", 
+     xlab = "Fitted Values", ylab = "Residuals",
+     pch = 16, cex = 0.5)
+abline(h = 0, col = "red", lwd = 2)
 
-# Post-hoc analysis
-emm_1 <- emmeans(model_1, ~ treatment | thermal_phase, mode = "asymptotic")
-print(emm_1)
+qqnorm(resid(model_original), main = "Normal Q-Q Plot (Original)",
+       pch = 16, cex = 0.5)
+qqline(resid(model_original), col = "red", lwd = 2)
 
-pairs_1 <- pairs(emm_1, adjust = "tukey")
-print(pairs_1)
+hist(resid(model_original), breaks = 50, 
+     main = "Residuals Distribution (Original)", 
+     xlab = "Residuals", col = "lightblue")
 
-cld_1 <- cld(emm_1, Letters = letters, decreasing = TRUE)
-print(cld_1)
+# Selected transformation plots
+plot(fitted(selected_model), resid(selected_model), 
+     main = paste("Residuals vs Fitted (", best_transformation, ")", sep=""), 
+     xlab = "Fitted Values", ylab = "Residuals",
+     pch = 16, cex = 0.5)
+abline(h = 0, col = "red", lwd = 2)
 
-# ============================================================================
-# MODEL 2: TREATMENT × TIME_BLOCK
-# ============================================================================
+qqnorm(resid(selected_model), main = paste("Normal Q-Q Plot (", best_transformation, ")", sep=""),
+       pch = 16, cex = 0.5)
+qqline(resid(selected_model), col = "red", lwd = 2)
 
-cat("\n=== MODEL 2: TREATMENT x TIME_BLOCK ===\n")
-model_2 <- lmer(model_formula_2, data = df, REML = FALSE, control = control_opts)
-cat("Model 2 AIC:", round(AIC(model_2), 2), "\n")
+hist(resid(selected_model), breaks = 50, 
+     main = paste("Residuals Distribution (", best_transformation, ")", sep=""), 
+     xlab = "Residuals", col = "lightgreen")
 
-anova_2 <- Anova(model_2, type = "III")
-print(anova_2)
-
-# Post-hoc analysis
-emm_2 <- emmeans(model_2, ~ treatment | time_block, mode = "asymptotic")
-print(emm_2)
-
-pairs_2 <- pairs(emm_2, adjust = "tukey")
-print(pairs_2)
-
-cld_2 <- cld(emm_2, Letters = letters, decreasing = TRUE)
-print(cld_2)
-
-# ============================================================================
-# MODEL 3: FULL FACTORIAL
-# ============================================================================
-
-cat("\n=== MODEL 3: FULL FACTORIAL ===\n")
-model_3 <- lmer(model_formula_3, data = df, REML = FALSE, control = control_opts)
-cat("Model 3 AIC:", round(AIC(model_3), 2), "\n")
-
-anova_3 <- Anova(model_3, type = "III")
-print(anova_3)
-
-# Check for significant three-way interaction
-three_way_p <- anova_3["treatment:thermal_phase:time_block", "Pr(>Chisq)"]
-cat("Three-way interaction p-value:", format.pval(three_way_p), "\n")
-
-if(three_way_p < 0.05) {
-  cat("*** THREE-WAY INTERACTION IS SIGNIFICANT ***\n")
-  emm_3 <- emmeans(model_3, ~ treatment | thermal_phase * time_block, mode = "asymptotic")
-} else {
-  emm_3 <- emmeans(model_3, ~ treatment | thermal_phase, mode = "asymptotic")
-}
-
-print(emm_3)
-pairs_3 <- pairs(emm_3, adjust = "tukey")
-print(pairs_3)
+dev.off()
 
 # ============================================================================
-# MODEL COMPARISON
+# COMPREHENSIVE MODEL ANALYSIS FUNCTION
 # ============================================================================
 
-cat("\n=== MODEL COMPARISON ===\n")
-
-model_comparison <- data.frame(
-  Model = c("Model_1_Thermal_Phase", "Model_2_Time_Block", "Model_3_Full_Factorial"),
-  Formula = c("treatment × thermal_phase", "treatment x time_block", "treatment x thermal_phase x time_block"),
-  AIC = c(AIC(model_1), AIC(model_2), AIC(model_3)),
-  Purpose = c("Weather-based effects", "Daily timing effects", "Comprehensive interactions")
-)
-model_comparison$AIC_Rank <- rank(model_comparison$AIC, ties.method = "min")
-model_comparison$Delta_AIC <- model_comparison$AIC - min(model_comparison$AIC)
-
-print(model_comparison)
-
-best_model_name <- model_comparison$Model[which.min(model_comparison$AIC)]
-cat("Best model (lowest AIC):", best_model_name, "\n")
-
-# ============================================================================
-# GENERATE OUTPUT FILES
-# ============================================================================
-
-# Function to create summary table
-create_summary_table <- function(emm_result, model_name) {
-  emm_summary <- summary(emm_result)
+analyze_model_comprehensive <- function(formula, model_name, data, variable_used, transformation_summary) {
   
-  # Handle confidence interval column names
+  cat("\n=== ANALYZING", model_name, "===\n")
+  
+  # Fit model
+  model <- lmer(formula, data = data, REML = FALSE, control = control_opts)
+  
+  # Model diagnostics
+  residuals_sample <- sample(resid(model), min(5000, length(resid(model))))
+  residual_normality <- shapiro.test(residuals_sample)
+  
+  # Random effects normality
+  random_effects <- ranef(model)
+  re_vals <- unlist(random_effects)
+  if(length(re_vals) >= 3) {
+    re_normality <- shapiro.test(re_vals)
+    re_norm_p <- re_normality$p.value
+  } else {
+    re_norm_p <- NA
+  }
+  
+  # Calculate ICC
+  var_comp <- VarCorr(model)
+  var_df <- as.data.frame(var_comp)
+  if(nrow(var_df) > 1) {
+    random_var <- var_df$vcov[1]
+    residual_var <- var_df$vcov[nrow(var_df)]
+    icc <- random_var / (random_var + residual_var)
+  } else {
+    icc <- 0
+  }
+  
+  # ANOVA Type III tests
+  anova_result <- Anova(model, type = "III")
+  
+  # Extract significance levels
+  get_significance <- function(p_val) {
+    if(is.na(p_val)) return("--")
+    if(p_val < 0.001) return("***")
+    if(p_val < 0.01) return("**")
+    if(p_val < 0.05) return("*")
+    return("NS")
+  }
+  
+  treatment_p <- if("treatment" %in% rownames(anova_result)) anova_result["treatment", "Pr(>Chisq)"] else NA
+  thermal_phase_p <- if("thermal_phase" %in% rownames(anova_result)) anova_result["thermal_phase", "Pr(>Chisq)"] else NA
+  time_block_p <- if("time_block" %in% rownames(anova_result)) anova_result["time_block", "Pr(>Chisq)"] else NA
+  
+  # Find interaction effects
+  interaction_effects <- grep(":", rownames(anova_result), value = TRUE)
+  if(length(interaction_effects) > 0) {
+    interaction_p <- anova_result[interaction_effects[1], "Pr(>Chisq)"]
+  } else {
+    interaction_p <- NA
+  }
+  
+  # Post-hoc analysis
+  formula_str <- paste(deparse(formula), collapse = " ")
+  
+  if(grepl("thermal_phase.*time_block|time_block.*thermal_phase", formula_str)) {
+    emm <- emmeans(model, ~ treatment | thermal_phase * time_block, mode = "asymptotic")
+    grouping_structure <- "thermal_phase * time_block"
+  } else if(grepl("thermal_phase", formula_str)) {
+    emm <- emmeans(model, ~ treatment | thermal_phase, mode = "asymptotic")
+    grouping_structure <- "thermal_phase"
+  } else if(grepl("time_block", formula_str)) {
+    emm <- emmeans(model, ~ treatment | time_block, mode = "asymptotic")
+    grouping_structure <- "time_block"
+  } else {
+    emm <- emmeans(model, ~ treatment, mode = "asymptotic")
+    grouping_structure <- "none"
+  }
+  
+  cld_result <- cld(emm, Letters = letters, decreasing = TRUE)
+  emm_summary <- summary(emm)
+  
+  # Handle confidence intervals
   if("lower.CL" %in% colnames(emm_summary)) {
     lower_col <- "lower.CL"
     upper_col <- "upper.CL"
@@ -274,8 +260,8 @@ create_summary_table <- function(emm_result, model_name) {
     upper_col <- "upper.CL"
   }
   
-  # Create base table
-  result_table <- data.frame(
+  # Create comprehensive results table
+  results_table <- data.frame(
     Model = model_name,
     Treatment = emm_summary$treatment,
     Thermal_Phase = if("thermal_phase" %in% colnames(emm_summary)) emm_summary$thermal_phase else "All_Combined",
@@ -284,37 +270,66 @@ create_summary_table <- function(emm_result, model_name) {
     SE = round(emm_summary$SE, 4),
     Lower_CI = round(emm_summary[[lower_col]], 4),
     Upper_CI = round(emm_summary[[upper_col]], 4),
-    Variable_Used = selected_description,
+    Statistical_Group = as.character(cld_result$.group),
+    
+    # Transformation comparison (unified assessment)
+    Original_AIC = transformation_summary$AIC[transformation_summary$Transformation == "Original"],
+    Log_AIC = transformation_summary$AIC[transformation_summary$Transformation == "Log"],
+    SQRT_AIC = transformation_summary$AIC[transformation_summary$Transformation == "SQRT"],
+    CBRT_AIC = transformation_summary$AIC[transformation_summary$Transformation == "CBRT"],
+    
+    # Model diagnostics
+    Residual_Normality_P = format(residual_normality$p.value, scientific = TRUE, digits = 2),
+    Random_Effect_Normality_P = if(is.na(re_norm_p)) "NA" else format(re_norm_p, scientific = TRUE, digits = 2),
+    ICC = format(icc, scientific = TRUE, digits = 2),
+    
+    # Type III test significance
+    Treatment_Sig = get_significance(treatment_p),
+    Thermal_Phase_Sig = get_significance(thermal_phase_p),
+    Time_Block_Sig = get_significance(time_block_p),
+    Interaction_Sig = get_significance(interaction_p),
+    
+    # Model info
+    Variable_Used = variable_used,
+    Grouping_Structure = grouping_structure,
+    Model_AIC = round(AIC(model), 2),
+    
     stringsAsFactors = FALSE
   )
   
-  return(result_table)
+  return(results_table)
 }
 
-# Generate summary tables
-table_1 <- create_summary_table(emm_1, "Model_1_Thermal_Phase")
-table_2 <- create_summary_table(emm_2, "Model_2_Time_Block") 
-table_3 <- create_summary_table(emm_3, "Model_3_Full_Factorial")
+# ============================================================================
+# THREE MODELING APPROACHES
+# ============================================================================
 
-# Save individual model results
-write.csv(table_1, "Model_1_Treatment_x_Thermal_Phase_deltaTA.csv", row.names = FALSE)
-write.csv(table_2, "Model_2_Treatment_x_Time_Block_deltaTA.csv", row.names = FALSE)
-write.csv(table_3, "Model_3_Full_Factorial_deltaTA.csv", row.names = FALSE)
+# Build model formulas using selected variable
+model_formula_1 <- as.formula(paste(selected_variable, "~ treatment * thermal_phase + (1|tube_id) + (1|date_factor)"))
+model_formula_2 <- as.formula(paste(selected_variable, "~ treatment * time_block + (1|tube_id) + (1|date_factor)"))
+model_formula_3 <- as.formula(paste(selected_variable, "~ treatment * thermal_phase * time_block + (1|tube_id) + (1|date_factor)"))
 
-# Save model comparison
-write.csv(model_comparison, "Model_Comparison_deltaTA.csv", row.names = FALSE)
+# Run all three models with comprehensive diagnostics
+results_1 <- analyze_model_comprehensive(model_formula_1, "Model_1_Thermal_Phase", df, selected_description, transformation_summary)
+results_2 <- analyze_model_comprehensive(model_formula_2, "Model_2_Time_Block", df, selected_description, transformation_summary)
+results_3 <- analyze_model_comprehensive(model_formula_3, "Model_3_Full_Factorial", df, selected_description, transformation_summary)
 
-# Create overall treatment ranking
-treatments <- levels(df$treatment)
-treatment_summary <- data.frame(
-  Treatment = treatments,
-  Model_1_Mean = sapply(treatments, function(t) mean(table_1$EMM[table_1$Treatment == t], na.rm = TRUE)),
-  Model_2_Mean = sapply(treatments, function(t) mean(table_2$EMM[table_2$Treatment == t], na.rm = TRUE)),
-  Model_3_Mean = sapply(treatments, function(t) mean(table_3$EMM[table_3$Treatment == t], na.rm = TRUE))
-)
-treatment_summary$Best_Model_Rank <- rank(-treatment_summary[[paste0("Model_", which.min(model_comparison$AIC), "_Mean")]], ties.method = "min")
+# ============================================================================
+# COMBINE RESULTS AND SAVE
+# ============================================================================
 
-write.csv(treatment_summary, "Treatment_Summary_deltaTA.csv", row.names = FALSE)
+cat("\n=== CREATING COMBINED RESULTS ===\n")
+
+# Combine all model results
+combined_results <- rbind(results_1, results_2, results_3)
+
+# Add model comparison information
+combined_results$Best_Model <- ifelse(combined_results$Model_AIC == min(combined_results$Model_AIC), "YES", "NO")
+combined_results$AIC_Rank <- match(combined_results$Model_AIC, sort(unique(combined_results$Model_AIC)))
+combined_results$Delta_AIC <- combined_results$Model_AIC - min(combined_results$Model_AIC)
+
+# Save the comprehensive combined results
+write.csv(combined_results, "Combined_LMM_Delta_Ta_Complete_Results.csv", row.names = FALSE)
 
 # ============================================================================
 # FINAL SUMMARY
@@ -323,14 +338,16 @@ write.csv(treatment_summary, "Treatment_Summary_deltaTA.csv", row.names = FALSE)
 cat("\n=== ANALYSIS COMPLETE ===\n")
 cat("Data transformation used:", selected_description, "\n")
 cat("Total observations:", nrow(df), "\n")
-cat("Best model:", best_model_name, "\n")
-cat("Three-way interaction significant:", ifelse(three_way_p < 0.05, "YES", "NO"), "\n")
+cat("Best model (lowest AIC):", combined_results$Model[combined_results$AIC_Rank == 1][1], "\n")
 
 cat("\nFiles generated:\n")
-cat("- residuals_original_delta_Ta.png\n")
-cat("- residuals_transformed_delta_Ta.png\n")
-cat("- Model_1_Treatment_x_Thermal_Phase_deltaTA.csv\n")
-cat("- Model_2_Treatment_x_Time_Block_deltaTA.csv\n")
-cat("- Model_3_Full_Factorial_deltaTA.csv\n")
-cat("- Model_Comparison_deltaTA.csv\n")
-cat("- Treatment_Summary_deltaTA.csv\n")
+cat("1. Combined_LMM_Delta_Ta_Complete_Results.csv - Complete results with diagnostics\n")
+cat("2. Diagnostic_Plots_Original_vs_Selected.png - Model diagnostic comparison\n")
+
+cat("\nCombined results include:\n")
+cat("- EMM, SE, confidence intervals, and statistical groups for all models\n")
+cat("- AIC values for all transformations (unified assessment)\n")
+cat("- Residual and random effects normality tests\n")
+cat("- ICC (Intraclass Correlation Coefficient)\n")
+cat("- Type III test significance levels\n")
+cat("- Model ranking based on AIC\n")
