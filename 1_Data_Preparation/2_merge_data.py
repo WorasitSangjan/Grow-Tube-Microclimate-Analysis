@@ -31,8 +31,8 @@ def load_data(hobo_file: str, weather_file: str) -> tuple:
     hobo_data = hobo_data.dropna(subset=['Timestamp'])
     weather_data = weather_data.dropna(subset=['timestamp'])
     
-    print(f"✓ HOBO data: {len(hobo_data):,} rows")
-    print(f"✓ Weather data: {len(weather_data):,} rows")
+    print(f"HOBO data: {len(hobo_data):,} rows")
+    print(f"Weather data: {len(weather_data):,} rows")
     
     return hobo_data, weather_data
 
@@ -140,9 +140,9 @@ def validate_merge(merged_data: pd.DataFrame) -> None:
     # Check for missing values
     missing_cols = merged_data.columns[merged_data.isna().any()].tolist()
     if missing_cols:
-        print(f"⚠ Columns with missing values: {missing_cols}")
+        print(f"Columns with missing values: {missing_cols}")
     else:
-        print("✓ No missing values")
+        print("No missing values")
     
     # Check time range
     time_range = merged_data['timestamp'].max() - merged_data['timestamp'].min()
@@ -185,7 +185,7 @@ def merge_hobo_weather_data(hobo_file: str = "hobo_data_2025_complete.csv",
     
     # Save output
     merged.to_csv(output_file, index=False)
-    print(f"✓ Saved to: {output_file}")
+    print(f"Saved to: {output_file}")
     
     # Preview
     print(f"\n=== DATA PREVIEW ===")
