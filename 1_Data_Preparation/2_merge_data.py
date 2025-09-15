@@ -47,7 +47,7 @@ def create_time_bins(hobo_data: pd.DataFrame, weather_data: pd.DataFrame) -> pd.
     # Create bin centers
     bin_centers = pd.date_range(start=start, end=end, freq='15min')
     
-    print(f"✓ Created {len(bin_centers):,} time bins from {start} to {end}")
+    print(f"Created {len(bin_centers):,} time bins from {start} to {end}")
     return bin_centers
 
 def assign_to_bins(timestamps: pd.Series, bin_centers: pd.DatetimeIndex, tolerance_minutes: int = 7.5) -> pd.Series:
@@ -98,7 +98,7 @@ def aggregate_hobo_data(hobo_data: pd.DataFrame, bin_centers: pd.DatetimeIndex) 
         'Value': 'mean'
     }).reset_index().rename(columns={'bin': 'timestamp'})
     
-    print(f"✓ Aggregated to {len(hobo_agg):,} records")
+    print(f"Aggregated to {len(hobo_agg):,} records")
     return hobo_agg
 
 def aggregate_weather_data(weather_data: pd.DataFrame, bin_centers: pd.DatetimeIndex) -> pd.DataFrame:
@@ -121,7 +121,7 @@ def aggregate_weather_data(weather_data: pd.DataFrame, bin_centers: pd.DatetimeI
     # Clean up columns
     weather_closest = weather_closest.drop(columns='timestamp').rename(columns={'bin': 'timestamp'})
     
-    print(f"✓ Selected {len(weather_closest):,} weather records")
+    print(f"Selected {len(weather_closest):,} weather records")
     return weather_closest
 
 def merge_datasets(hobo_agg: pd.DataFrame, weather_agg: pd.DataFrame) -> pd.DataFrame:
@@ -130,7 +130,7 @@ def merge_datasets(hobo_agg: pd.DataFrame, weather_agg: pd.DataFrame) -> pd.Data
     
     merged = pd.merge(hobo_agg, weather_agg, on='timestamp', how='inner')
     
-    print(f"✓ Merged dataset: {len(merged):,} records")
+    print(f"Merged dataset: {len(merged):,} records")
     return merged
 
 def validate_merge(merged_data: pd.DataFrame) -> None:
