@@ -358,9 +358,6 @@ def main_hobo_imputation_workflow_fast(file_path, tolerance_minutes=3, create_pl
     original_data_points = len(df)
     final_data_points = len(df_imputed[df_imputed['Value'].notna()])
     
-    print(f"⏱️ Processing time: {duration:.1f} seconds")
-    print(f"Subjects processed: {total_subjects}")
-    print(f"Time points in complete grid: {total_timepoints:,}")
     print(f"Original data points: {original_data_points:,}")
     print(f"Final data points: {final_data_points:,}")
     print(f"Data points added through imputation: {final_data_points - original_data_points:,}")
@@ -374,7 +371,7 @@ def main_hobo_imputation_workflow_fast(file_path, tolerance_minutes=3, create_pl
 
 if __name__ == "__main__":
     # Run the complete workflow
-    file_path = "hobo_data_2025_uncover.csv"
+    file_path = "hobo_data_2025.csv"
     
     df_imputed = main_hobo_imputation_workflow_fast(
         file_path=file_path,
