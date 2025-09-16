@@ -31,9 +31,9 @@ def load_and_validate_data(file_path: str, start_date: str = "2024-10-25") -> pd
     
     combinations = df.groupby(['Material', 'Condition', 'Replicate']).size()
     
-    print(f"✓ Date range: {df['datetime'].min()} to {df['datetime'].max()}")
-    print(f"✓ Total records: {len(df):,}")
-    print(f"✓ Unique combinations: {len(combinations)}")
+    print(f"Date range: {df['datetime'].min()} to {df['datetime'].max()}")
+    print(f"Total records: {len(df):,}")
+    print(f"Unique combinations: {len(combinations)}")
     
     return df
 
@@ -192,7 +192,7 @@ def filter_data_by_date(input_file: str, output_file: str, start_date: str = "20
     
     # Save
     filtered_df.to_csv(output_file, index=False)
-    print(f"✓ Saved to: {output_file}")
+    print(f"Saved to: {output_file}")
     
     return output_file
 
@@ -225,7 +225,7 @@ def preview_temperature_data(input_file: str = "merged_data_2025.csv",
     if create_summary:
         create_summary_plot(df)
     
-    print("\n✓ Preview complete!")
+    print("\nPreview complete!")
 
 # ============================================================================
 # USAGE
