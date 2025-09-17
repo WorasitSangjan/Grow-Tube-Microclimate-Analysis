@@ -1,8 +1,7 @@
 # Data Preparation
 
-This section contains Python scripts for preparing and preprocessing HOBO temperature data for grow tube microclimate analysis.
-
 ## Overview
+This section contains Python scripts for preparing and preprocessing HOBO temperature data for grow tube microclimate analysis.
 
 The data preparation workflow consists of three main steps:
 1. **Data Imputation** - Handle missing values in HOBO temperature data
@@ -85,15 +84,16 @@ python 3_data_preview_fig.py
 - `create_monthly`: Generate monthly plots (default: True)
 - `create_summary`: Generate summary plots (default: True)
 
-## Example Output
+## Requirements
 
-The data preparation pipeline produces high-quality temperature datasets ready for analysis:
+**Python Version:**
+- Python >= 3.8
 
-![Temperature Data Example](https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/1_Data_Preparation/images/img.png)
-
-*Temperature patterns for Plastic Low and Plastic Raise treatments showing grow tube effects from October 2024 to March 2025. Four replicates (colored lines) track closely while the ambient air temperature (dashed black line) provides reference conditions.*
-
-This visualization demonstrates successful data imputation, merging, and quality validation across the complete workflow.
+```
+pandas>=1.3.0
+numpy>=1.21.0
+matplotlib>=3.4.0
+```
 
 ## Data Flow
 
@@ -120,16 +120,15 @@ Merged Dataset
    - Temporal patterns
 ```
 
-## Requirements
+## Example Output
 
-**Python Version:**
-- Python >= 3.8
+The data preparation pipeline produces high-quality temperature datasets ready for analysis:
 
-```
-pandas>=1.3.0
-numpy>=1.21.0
-matplotlib>=3.4.0
-```
+![Temperature Data Example](https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/1_Data_Preparation/images/img.png)
+
+*Temperature patterns for Plastic Low and Plastic Raise treatments showing grow tube effects from October 2024 to March 2025. Four replicates (colored lines) track closely while the ambient air temperature (dashed black line) provides reference conditions.*
+
+This visualization demonstrates the successful application of data imputation, merging, and quality validation throughout the entire workflow.
 
 ## Quality Checks
 
