@@ -1,121 +1,195 @@
-# Thermal Differential Analysis
+# Temperature Differential Analysis Pipeline
+
+**Author:** Worasit Sangjan  
+**Date:** May 2025
 
 ## Overview
 
-This section contains the data analysis of thermal responses in different grow tube treatments under varying environmental conditions. The study examines how different tube materials and configurations affect internal temperature relative to ambient conditions and control treatments.
+This repository contains a complete analysis pipeline for studying grow tube temperature effects during dormancy periods. The analysis combines weather station data with grow tube temperature measurements to determine the thermal benefits of different protection materials and configurations.
 
-## Repository Structure
+## Complete Pipeline Structure
 
-```
-Grow-Tube-Microclimate-Analysis/
-├── 2_1_Temperature_Differential_Analysis/
-│   ├── 1_1_lmm_delta_ta.r
-│   ├── 1_2_lmm_delta_tn.r
-│   ├── 2_lmm_back_transform.r
-│   ├── 3_1_lmm_thermalphase_fig.r
-│   ├── 3_2_lmm_timeblock_fig.r
-│   └── 3_3_lmm_heatmap_fig.r
-```
-## Files Description
+### Phase 0: Threshold Determination and Data Preparation
 
-### Temperature Differential Analysis Scripts (`2_1_Temperature_Differential_Analysis/`)
-- `1_1_lmm_delta_ta.r`: Linear mixed model analysis for ΔT(a) - ambient temperature differences
-- `1_2_lmm_delta_tn.r`: Linear mixed model analysis for ΔT(n) - no-tube control differences  
-- `2_lmm_back_transform.r`: Back-transformation of cube root transformed data
-- `3_1_lmm_thermalphase_fig.r`: Generates thermal phase comparison figures
-- `3_2_lmm_timeblock_fig.r`: Creates time block analysis visualizations
-- `3_3_lmm_heatmap_fig.r`: Produces comprehensive heatmap summaries
+**Step 0.1 - Thermal Phase Analysis:**
+- `0_1_thermal_phase_fig.py` - Analyzes weather data to determine data-driven temperature and solar radiation thresholds
+- **Output:** Thermal phase distribution plots and threshold values (e.g., 3.3°C temperature threshold, 100 W/m² solar threshold)
 
+**Step 0.2 - Time Block Analysis:**
+- `0_2_time_block_fig.py` - Analyzes diurnal patterns to establish optimal time block boundaries
+- **Output:** Time block analysis figures and validation of 4-period structure (07-11, 11-15, 15-19, 19-07)
 
+**Step 0.3 - Integrated Data Preparation:**
+- `0_3_data_preparation.py` - Uses thresholds from Steps 0.1 and 0.2 to prepare final analysis dataset
+- **Output:** `grow_tube_categorized.csv` with temperature deltas and categorical assignments
 
+### Phase 1: Statistical Analysis (R)
 
-## Temperature Differential Analysis
+**Linear Mixed-Effects Modeling:**
+- `1_1_lmm_delta_tn.r` - Analysis of ΔTn (tube - no-tube control)
+- `1_2_lmm_delta_ta.r` - Analysis of ΔTa (tube - ambient air)
 
-This analysis evaluates the thermal effects of grow tube treatments relative to both external ambient conditions and internal no-tube controls. Environmental variability during dormancy is addressed using two grouping strategies: thermal phases and time blocks.
+**Features:**
+- Automatic transformation assessment (original, log, sqrt, cube root)
+- Three modeling approaches: thermal phase, time block, and full factorial
+- Comprehensive model diagnostics and selection
 
-### Data Grouping
+### Phase 2: Back-transformation and Interpretation
 
-**Thermal Phases**: Classify days into four thermal phases based on daily mean air temperature and solar radiation thresholds:
-- **Cold Cloudy**: Temperature < 3.5°C, Solar radiation < 100 W/m²
-- **Cold Sunny**: Temperature < 3.5°C, Solar radiation ≥ 100 W/m²
-- **Warm Cloudy**: Temperature ≥ 3.5°C, Solar radiation < 100 W/m²
-- **Warm Sunny**: Temperature ≥ 3.5°C, Solar radiation ≥ 100 W/m²
+**Data Transformation:**
+- `2_lmm_back_transform.r` - Converts transformed statistical results back to temperature scale (°C)
 
-**Time Blocks**: Divide each day into four time blocks based on solar radiation patterns:
+### Phase 3: Visualization and Results
+
+**Figure Generation:**
+- `3_1_lmm_heatmap_fig.r` - Full factorial heatmaps showing treatment effects across all conditions
+- `3_2_lmm_thermalphase_fig.r` - Treatment comparisons by thermal phase
+- `3_3_lmm_timeblock_fig.r` - Treatment comparisons by time block
+
+## Data Grouping Strategy
+
+The pipeline uses data-driven thresholds determined in Phase 0:
+
+**Thermal Phases** (from `0_1_thermal_phase_fig.py`):
+- **Cold Cloudy**: Temperature < 3.3°C, Solar radiation < 100 W/m²
+- **Cold Sunny**: Temperature < 3.3°C, Solar radiation ≥ 100 W/m²
+- **Warm Cloudy**: Temperature ≥ 3.3°C, Solar radiation < 100 W/m²
+- **Warm Sunny**: Temperature ≥ 3.3°C, Solar radiation ≥ 100 W/m²
+
+**Time Blocks** (from `0_2_time_block_fig.py`):
 - **Morning Warming** (07:00-11:00)
 - **Peak Heat** (11:00-15:00)
 - **Evening Cooling** (15:00-19:00)
 - **Night Period** (19:00-07:00)
 
-### Thermal Metrics
+## Temperature Metrics
 
-**ΔT(a) - Ambient Temperature Difference:**
+**ΔTa - Ambient Temperature Difference:**
 ```
-ΔT(a) = T_tube - T_ambient
+ΔTa = T_tube - T_ambient
 ```
-The difference between air temperature inside a grow tube and ambient air temperature at the same bin.
 
-**ΔT(n) - No-tube Control Difference:**
+**ΔTn - No-tube Control Difference:**
 ```
-ΔT(n) = T_tube - T_no-tube
+ΔTn = T_tube - T_no-tube
 ```
-The difference between air temperature inside a grow tube and the average no-tube control at the same bin.
 
-### Statistical Analysis
-
-Both metrics were analyzed using Linear Mixed-Effects Models (LMMs) in R via the lme4 package. The analysis included:
-
-- **Software**: R (https://www.r-project.org/)
-- **Package**: lme4 (Bates et al., 2015)
-- **Model Selection**: Based on residual diagnostics and Akaike Information Criterion (AIC)
-- **Transformations**: Cube root transformations applied when needed based on residual diagnostics
-- **Post-hoc Analysis**: Estimated marginal means (emmeans package) with Tukey adjustment (α = 0.05)
-
-### Modeling Frameworks
-
-Three modeling frameworks were applied:
-1. **Treatment × Thermal Phase**: Examining treatment effects across different weather conditions
-2. **Treatment × Time Block**: Analyzing treatment effects across different times of day
-3. **Full Factorial Interactions**: Complete interaction analysis
-
-## Key Findings (Temperature Differential Analysis)
-
-### Treatment Effects
-
-**Plastic Low Treatment** showed the strongest warming effects:
-- Maximum warming during **Warm Sunny** phase: +4.02°C above ambient
-- Peak warming during **Peak Heat** period: +2.22°C above ambient
-- Highest combined effect during **Warm Sunny/Peak Heat**: +4.06°C above ambient
-- Consistently warmer across all conditions, including cooler periods
-
-**Paper-based Treatments** remained consistently cooler:
-- **Paper Raise** showed significantly lower temperatures only during warmest conditions
-- Generally maintained temperatures closer to ambient conditions
-
-### Environmental Response Patterns
-
-- **Sunny conditions** (≥100 W/m²) produced greater temperature differentials than cloudy conditions
-- **Peak Heat period** (11:00-15:00) showed maximum treatment effects
-- **Plastic treatments** responded more dramatically to solar radiation
-- **Time-of-day effects** were most pronounced during high solar radiation periods
-
-
-
-## Usage
-
-**Data Preparation**: See `1_Data_Preparation/README.md` for detailed instructions on data preprocessing.
-
-**Temperature Differential Analysis**: 
-1. Run `1_1_lmm_delta_ta.r` and `1_2_lmm_delta_tn.r` for statistical modeling
-2. Execute `2_lmm_back_transform.r` if data transformations were applied
-3. Generate figures using scripts `3_1_lmm_thermalphase_fig.r`, `3_2_lmm_timeblock_fig.r`, and `3_3_lmm_heatmap_fig.r`
+## Usage Instructions
 
 ## Requirements
 
-- **R** (≥4.0.0) for statistical analysis and visualization
-- Required R packages:
-  - `lme4`: Linear mixed-effects models
-  - `emmeans`: Estimated marginal means and post-hoc comparisons
-  - Additional visualization packages as specified in individual scripts
-  - `emmeans`: Estimated marginal means and post-hoc comparisons
-  - Additional visualization packages as specified in individual scripts
+### Python Environment
+**Version:** Python >= 3.8
+
+**Required Packages:**
+```bash
+pip install pandas>=1.3.0 numpy>=1.21.0 matplotlib>=3.4.0 seaborn
+```
+
+**Core Libraries Used:**
+- `pandas>=1.3.0` - Data manipulation and analysis
+- `numpy>=1.21.0` - Numerical computations  
+- `matplotlib>=3.4.0` - Plotting and visualization
+- `seaborn` - Statistical data visualization
+- `warnings` - Warning control (built-in)
+
+### R Environment
+**Version:** R 4.0.0 or higher
+
+**Required Packages:**
+```r
+install.packages(c("lme4", "emmeans", "car", "multcomp", "dplyr", "ggplot2"))
+```
+
+**Package Details:**
+- `lme4` - Linear mixed-effects models
+- `emmeans` - Estimated marginal means and post-hoc comparisons  
+- `car` - Companion to Applied Regression (Type III ANOVA)
+- `multcomp` - Multiple comparisons procedures
+- `dplyr` - Data manipulation
+- `ggplot2` - Grammar of graphics plotting
+
+### Input Data Files Required
+- `cleaned_weather_2023_2024.csv` - Weather station data (2023-2024 season)
+- `cleaned_weather_2024_2025.csv` - Weather station data (2024-2025 season)
+- `2024_data_grow_tube.csv` - Grow tube temperature measurements (2024)
+- `2025_data_grow_tube.csv` - Grow tube temperature measurements (2025)
+
+### Step-by-Step Execution
+
+1. **Determine Thresholds:**
+   ```bash
+   python 0_1_thermal_phase_fig.py    # Generate thermal phase thresholds
+   python 0_2_time_block_fig.py       # Validate time block structure
+   ```
+
+2. **Prepare Analysis Dataset:**
+   ```bash
+   python 0_3_data_preparation.py     # Create grow_tube_categorized.csv
+   ```
+
+3. **Statistical Analysis:**
+   ```r
+   source("1_1_lmm_delta_tn.r")       # ΔTn analysis
+   source("1_2_lmm_delta_ta.r")       # ΔTa analysis
+   source("2_lmm_back_transform.r")   # Back-transform results
+   ```
+
+4. **Generate Figures:**
+   ```r
+   source("3_1_lmm_heatmap_fig.r")    # Comprehensive heatmaps
+   source("3_2_lmm_thermalphase_fig.r") # Thermal phase figures
+   source("3_3_lmm_timeblock_fig.r")  # Time block figures
+   ```
+
+## Key Outputs
+
+### Data Files
+- `grow_tube_categorized.csv` - Final analysis dataset
+- `Combined_LMM_Delta_Ta_Complete_Results.csv` - ΔTa statistical results
+- `Combined_LMM_Delta_Tn_Complete_Results.csv` - ΔTn statistical results
+- `Back_Transformed_Delta_Ta_Results.csv` - ΔTa results in °C
+- `Back_Transformed_Delta_Tn_Results.csv` - ΔTn results in °C
+
+### Figures
+- Thermal phase and time block distribution plots
+- Treatment effect heatmaps
+- Statistical comparison figures by thermal phase and time block
+
+## Statistical Analysis Details
+
+**Software:** R with lme4 package (Bates et al., 2015)
+**Model Selection:** AIC-based with residual diagnostics
+**Transformations:** Cube root when needed for normality
+**Post-hoc Analysis:** Estimated marginal means with Tukey adjustment (α = 0.05)
+**Random Effects:** Treatment replicates and measurement dates
+
+## Key Findings
+
+**Plastic Low Treatment:**
+- Maximum warming: +4.02°C during Warm Sunny conditions
+- Peak diurnal effect: +2.22°C during Peak Heat period
+- Consistently positive temperature effects across all conditions
+
+**Environmental Interactions:**
+- Sunny conditions amplify treatment effects
+- Peak Heat period shows maximum differentiation
+- Temperature effects vary significantly by both thermal phase and time block
+
+## Repository Structure
+
+```
+Temperature_Differential_Analysis/
+├── 0_1_thermal_phase_fig.py      # Threshold determination
+├── 0_2_time_block_fig.py         # Time block validation  
+├── 0_3_data_preparation.py       # Integrated data prep
+├── 1_1_lmm_delta_tn.r           # ΔTn statistical analysis
+├── 1_2_lmm_delta_ta.r           # ΔTa statistical analysis
+├── 2_lmm_back_transform.r       # Result back-transformation
+├── 3_1_lmm_heatmap_fig.r        # Heatmap visualizations
+├── 3_2_lmm_thermalphase_fig.r   # Thermal phase figures
+├── 3_3_lmm_timeblock_fig.r      # Time block figures
+└── README.md                     # This documentation
+```
+
+This pipeline ensures that all categorical assignments and thresholds are data-driven and empirically validated before statistical analysis.
