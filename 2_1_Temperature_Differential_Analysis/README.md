@@ -59,55 +59,6 @@ Temperature_Differential_Analysis/
 - `3_2_lmm_thermalphase_fig.r` - Treatment comparisons by thermal phase
 - `3_3_lmm_timeblock_fig.r` - Treatment comparisons by time block
 
-### Step-by-Step Execution
-
-1. **Determine Thresholds:**
-   ```bash
-   python 0_1_thermal_phase_fig.py    # Generate thermal phase thresholds
-   python 0_2_time_block_fig.py       # Validate time block structure
-   ```
-
-2. **Prepare Analysis Dataset:**
-   ```bash
-   python 0_3_data_preparation.py     # Create grow_tube_categorized.csv
-   ```
-
-3. **Statistical Analysis:**
-   ```r
-   source("1_1_lmm_delta_tn.r")       # ΔTn analysis
-   source("1_2_lmm_delta_ta.r")       # ΔTa analysis
-   source("2_lmm_back_transform.r")   # Back-transform results
-   ```
-
-4. **Generate Figures:**
-   ```r
-   source("3_1_lmm_heatmap_fig.r")    # Comprehensive heatmaps
-   source("3_2_lmm_thermalphase_fig.r") # Thermal phase figures
-   source("3_3_lmm_timeblock_fig.r")  # Time block figures
-   ```
-
-## Key Outputs
-
-### Data Files
-- `grow_tube_categorized.csv` - Final analysis dataset
-- `Combined_LMM_Delta_Ta_Complete_Results.csv` - ΔTa statistical results
-- `Combined_LMM_Delta_Tn_Complete_Results.csv` - ΔTn statistical results
-- `Back_Transformed_Delta_Ta_Results.csv` - ΔTa results in °C
-- `Back_Transformed_Delta_Tn_Results.csv` - ΔTn results in °C
-
-### Figures
-- Thermal phase and time block distribution plots
-- Treatment effect heatmaps
-- Statistical comparison figures by thermal phase and time block
-
-## Statistical Analysis Details
-
-**Software:** R with lme4 package (Bates et al., 2015)
-**Model Selection:** AIC-based with residual diagnostics
-**Transformations:** log, sqrt, cube root
-**Post-hoc Analysis:** Estimated marginal means with Tukey adjustment (α = 0.05)
-**Random Effects:** Treatment replicates and measurement dates
-
 ## Requirements
 
 ### Python Environment
@@ -119,7 +70,7 @@ pip install pandas>=1.3.0 numpy>=1.21.0 matplotlib>=3.4.0 seaborn
 ```
 
 ### R Environment
-**Version:** R 4.0.0 or higher
+**Version:** R >= 4.0.0 
 
 **Required Packages:**
 ```r
@@ -131,6 +82,27 @@ install.packages(c("lme4", "emmeans", "car", "multcomp", "dplyr", "ggplot2"))
 - `cleaned_weather_2024_2025.csv` - Weather station data (2024-2025 season)
 - `2024_data_grow_tube.csv` - Grow tube temperature measurements (2024)
 - `2025_data_grow_tube.csv` - Grow tube temperature measurements (2025)
+
+## Key Outputs
+
+### Data Files
+- `grow_tube_categorized.csv` - Dataset for statistical analysis
+- `Combined_LMM_Delta_Ta_Complete_Results.csv` - ΔTa statistical results
+- `Combined_LMM_Delta_Tn_Complete_Results.csv` - ΔTn statistical results
+- `Back_Transformed_Delta_Ta_Results.csv` - ΔTa results in °C
+- `Back_Transformed_Delta_Tn_Results.csv` - ΔTn results in °C
+
+### Figures
+- Thermal phase and time block distribution plots
+- Treatment effect heatmaps
+- Statistical comparison figures by thermal phase and time block
+
+## Statistical Analysis Details
+- **Software:** R with lme4 package (Bates et al., 2015)
+- **Model Selection:** AIC-based with residual diagnostics
+- **Transformations:** log, sqrt, cube root
+- **Post-hoc Analysis:** Estimated marginal means with Tukey adjustment (α = 0.05)
+- **Random Effects:** Treatment replicates and measurement dates
 
 ## License
 
