@@ -1,0 +1,17 @@
+# Generated data files
+grow_tube_categorized.csv
+*_Complete_Results.csv
+Back_Transformed_*.csv
+Temperature_Effects_Comparison.csv
+
+# Generated figures
+*.png
+*.pdf
+
+# R temporary files
+.Rhistory
+.RData
+
+# Python cache
+__pycache__/
+*.pyc
