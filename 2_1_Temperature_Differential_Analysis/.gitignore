@@ -1,0 +1,19 @@
+# Generated data files
+grow_tube_categorized.csv
+Combined_LMM_Delta_*_Complete_Results.csv
+Back_Transformed_Delta_*_Results.csv
+Temperature_Effects_Comparison.csv
+Diagnostic_Plots_*.png
+
+# Generated figures
+Temperature_Effects_Delta_*_Model3.png
+Temperature_Effects_Delta_*_ThermalPhase.png
+Temperature_Effects_Delta_*_TimeBlock.png
+
+# R temporary files
+.Rhistory
+.RData
+
+# Python cache
+__pycache__/
+*.pyc
