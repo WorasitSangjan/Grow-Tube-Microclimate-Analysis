@@ -16,8 +16,14 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Set plotting style
-plt.style.use('default')
-sns.set_palette("viridis")
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 14
+plt.rcParams['axes.labelsize'] = 14
+plt.rcParams['xtick.labelsize'] = 12
+plt.rcParams['ytick.labelsize'] = 12
+plt.rcParams['legend.fontsize'] = 15
+plt.rcParams['axes.linewidth'] = 1.25
+plt.rcParams['lines.linewidth'] = 1.0
 
 # ============================================================================
 # CORE FUNCTIONS
@@ -105,11 +111,11 @@ def determine_thresholds(daily_summary: pd.DataFrame) -> dict:
         }
     }
     
-    print("Temperature Bins (°C):")
+    print("Temperature bins (°C):")
     for i, (low, high) in enumerate(thresholds['temperature_bins']):
         print(f"  Bin {i+1}: {low:.1f} to {high:.1f}")
     
-    print(f"\nSolar Thresholds (W/m²):")
+    print(f"\nSolar thresholds (W/m²):")
     print(f"  Start: {solar_q1:.1f}, Peak: {solar_q3:.1f}")
     
     return thresholds
@@ -118,17 +124,17 @@ def create_distribution_plots(daily_summary: pd.DataFrame, thresholds: dict) -> 
     """Create comprehensive distribution plots with data-driven thresholds."""
     print("Creating plots...")
 
-    fig = plt.figure(figsize=(18, 11))
+    fig = plt.figure(figsize=(18, 12))
     gs = fig.add_gridspec(2, 3, height_ratios=[1, 1.2])
 
     # Define subplot axes
     box_axes = [fig.add_subplot(gs[0, i]) for i in range(3)]  # Top row: boxplots
     hist_axes = [fig.add_subplot(gs[1, i]) for i in range(3)]  # Bottom row: histograms
 
-    # Data and styling
-    colors = ['steelblue', 'darkorange', 'seagreen']
+    # Data and styling - restore original colors with accessibility features
+    colors = ['steelblue', 'darkorange', 'seagreen']  # Original colors
     variables = ['air_temp_mean', 'diurnal_range', 'solar_radiation_mean']
-    titles = ['Daily Mean Air Temperature', 'Daily Diurnal Range', 'Daily Mean Solar Radiation']
+    titles = ['Daily mean air temperature', 'Daily diurnal range', 'Daily mean solar radiation']
     units = ['°C', '°C', 'W/m²']
 
     for i, (var, title, unit, color) in enumerate(zip(variables, titles, units, colors)):
@@ -139,38 +145,41 @@ def create_distribution_plots(daily_summary: pd.DataFrame, thresholds: dict) -> 
         ax_left.hist(daily_summary[var], bins=25, color=color,
                      alpha=0.7, edgecolor='black', linewidth=0.5)
 
-        # Add statistics lines
-        ax_left.axvline(stats['mean'], color='red', linestyle='-', linewidth=2,
-                        label=f"Mean: {stats['mean']:.1f}{unit}")
-        ax_left.axvline(stats['50%'], color='green', linestyle='--', linewidth=2,
-                        label=f"Median: {stats['50%']:.1f}{unit}")
-        ax_left.axvline(stats['25%'], color='orange', linestyle=':', linewidth=2,
-                        label=f"Q1: {stats['25%']:.1f}{unit}")
-        ax_left.axvline(stats['75%'], color='purple', linestyle=':', linewidth=2,
-                        label=f"Q3: {stats['75%']:.1f}{unit}")
+        # Add statistics lines with different styles for accessibility
+        ax_left.axvline(stats['mean'], color='red', linestyle='-', linewidth=2.0,
+                        label=f"Mean: {stats['mean']:.1f} {unit}")
+        ax_left.axvline(stats['50%'], color='green', linestyle='--', linewidth=2.0,
+                        label=f"Median: {stats['50%']:.1f} {unit}")
+        ax_left.axvline(stats['25%'], color='orange', linestyle=':', linewidth=2.0,
+                        label=f"Q1: {stats['25%']:.1f} {unit}")
+        ax_left.axvline(stats['75%'], color='purple', linestyle=':', linewidth=2.0,
+                        label=f"Q3: {stats['75%']:.1f} {unit}")
         ax_left.axvspan(stats['mean'] - stats['std'], stats['mean'] + stats['std'],
-                        alpha=0.2, color='gray', label='±1 Std Dev')
+                        alpha=0.2, color='gray', label='±1 std dev')
 
         # Threshold markers
         if var == 'air_temp_mean':
-            ax_left.axvline(stats['25%'], color='blue', linestyle='-.', linewidth=2,
-                            label=f"Cold Dormancy: {stats['25%']:.1f}°C")
-            ax_left.axvline(stats['75%'], color='red', linestyle='-.', linewidth=2,
-                            label=f"Warm Dormancy: {stats['75%']:.1f}°C")
+            ax_left.axvline(stats['25%'], color='blue', linestyle='-.', linewidth=2.0,
+                            label=f"Cold dormancy: {stats['25%']:.1f}°C")
+            ax_left.axvline(stats['75%'], color='red', linestyle='-.', linewidth=2.0,
+                            label=f"Warm dormancy: {stats['75%']:.1f}°C")
 
         elif var == 'solar_radiation_mean':
             solar_thresh = thresholds['solar_thresholds']
-            ax_left.axvline(solar_thresh['solar_start'], color='yellow', linestyle='-.', linewidth=2,
-                            label=f"Low Solar: {solar_thresh['solar_start']:.1f} W/m²")
-            ax_left.axvline(solar_thresh['solar_peak'], color='red', linestyle='-.', linewidth=2,
-                            label=f"High Solar: {solar_thresh['solar_peak']:.1f} W/m²")
+            ax_left.axvline(solar_thresh['solar_start'], color='orange', linestyle='-.', linewidth=2.0,
+                            label=f"Low solar: {solar_thresh['solar_start']:.1f} W/m²")
+            ax_left.axvline(solar_thresh['solar_peak'], color='red', linestyle='-.', linewidth=2.0,
+                            label=f"High solar: {solar_thresh['solar_peak']:.1f} W/m²")
 
-        ax_left.set_title(f'{title} Distribution', fontsize=18, fontweight='bold', pad=20)
-        ax_left.set_xlabel(f'{title} ({unit})', fontsize=15)
-        ax_left.set_ylabel('Count', fontsize=15)
-        ax_left.tick_params(axis='both', labelsize=15)
-        ax_left.legend(bbox_to_anchor=(1.05, 1), loc='upper center', fontsize=12)
-        ax_left.grid(True, alpha=0.3)
+        ax_left.set_xlabel(f'{title} ({unit})', fontsize=18)
+        ax_left.set_ylabel('Count', fontsize=18)
+        ax_left.tick_params(axis='both', width=0.5, labelsize=17) 
+        
+        # Legend below the graph
+        ax_left.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), 
+                      ncol=2, frameon=False, fontsize=16)
+        
+        ax_left.grid(True, alpha=0.3, linewidth=0.5)
 
         # --- Boxplot (top row) ---
         ax_right = box_axes[i]
@@ -180,20 +189,29 @@ def create_distribution_plots(daily_summary: pd.DataFrame, thresholds: dict) -> 
         box_plot = ax_right.boxplot(season_data, labels=['2023-2024', '2024-2025'],
                                     patch_artist=True, notch=True)
 
+        # Use different colors for seasons with visual distinction
         for patch, season_color in zip(box_plot['boxes'], ['lightblue', 'lightcoral']):
             patch.set_facecolor(season_color)
             patch.set_alpha(0.7)
 
-        ax_right.axhline(stats['mean'], color='red', linestyle='-', linewidth=2,
-                         label=f"Overall Mean: {stats['mean']:.1f}{unit}")
+        ax_right.axhline(stats['mean'], color='red', linestyle='-', linewidth=1.0,
+                         label=f"Overall mean: {stats['mean']:.1f} {unit}")
 
-        ax_right.set_title(f'{title} by Year', fontsize=18, fontweight='bold', pad=20)
-        ax_right.set_ylabel(f'{title} ({unit})', fontsize=15)
-        ax_right.tick_params(axis='both', labelsize=15)
-        ax_right.legend(fontsize=12)
-        ax_right.grid(True, alpha=0.3)
+        ax_right.set_ylabel(f'{title} ({unit})', fontsize=18)
+        ax_right.tick_params(axis='both', width=0.5, labelsize=17)
+        ax_right.tick_params(axis='x', which='both', length=0)  # No x-axis ticks for categorical
+        
+        # Legend below the graph
+        ax_right.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), 
+                       frameon=False, fontsize=16)
+        
+        ax_right.grid(True, alpha=0.3, linewidth=0.5)
 
-    plt.tight_layout(h_pad=5.0, rect=[0, 0, 1, 0.95])
+    plt.tight_layout()
+    plt.subplots_adjust(hspace=0.215, wspace=0.25)
+    
+    plt.savefig('thermal_phase_analysis.png', dpi=600, bbox_inches='tight',
+                facecolor='white', edgecolor='none')
     plt.show()
 
 # ============================================================================
