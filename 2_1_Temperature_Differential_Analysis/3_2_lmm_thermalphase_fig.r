@@ -1,6 +1,6 @@
 # Author: Worasit Sangjan
-# Date: 7 September 2025
-# Version: 2
+# Date: 21 September 2025
+# Version: 2.1
 
 # ============================================================================
 # FIGURE GENERATION: Thermal Phase
@@ -45,16 +45,16 @@ prepare_figure_data <- function(data, variable_name, model_filter = "Model_1_The
     filter(!is.na(EMM_Original_C)) %>%
     filter(!is.na(Statistical_Group)) %>%
     mutate(
-      # Clean treatment names
+      # Clean treatment names - sentence case
       treatment_clean = case_when(
         Treatment == "Paper_low" ~ "Paper\nLow",
-        Treatment == "Paper_raise" ~ "Paper\nRaise", 
+        Treatment == "Paper_raise" ~ "Paper\nHigh", 
         Treatment == "Plastic_low" ~ "Plastic\nLow",
-        Treatment == "Plastic_raise" ~ "Plastic\nRaise",
+        Treatment == "Plastic_raise" ~ "Plastic\nHigh",
         TRUE ~ as.character(Treatment)
       ),
       
-      # Clean thermal phase names and set proper order
+      # Clean thermal phase names - sentence case
       thermal_phase_clean = case_when(
         grepl("cold.*cloudy", Thermal_Phase, ignore.case = TRUE) ~ "Cold Cloudy",
         grepl("cold.*sunny", Thermal_Phase, ignore.case = TRUE) ~ "Cold Sunny",
@@ -76,7 +76,7 @@ prepare_figure_data <- function(data, variable_name, model_filter = "Model_1_The
     # Set factor levels for proper ordering
     mutate(
       treatment_clean = factor(treatment_clean, 
-                              levels = c("Paper\nLow", "Paper\nRaise", "Plastic\nLow", "Plastic\nRaise")),
+                              levels = c("Paper\nLow", "Paper\nHigh", "Plastic\nLow", "Plastic\nHigh")),
       thermal_phase_clean = factor(thermal_phase_clean, 
                                   levels = c("Cold Cloudy", "Cold Sunny", "Warm Cloudy", "Warm Sunny"))
     ) %>%
@@ -119,7 +119,7 @@ create_thermal_phase_figure <- function(plot_data, title_suffix, y_label, filena
     
     # Significance letters
     geom_text(aes(x = treatment_clean, y = letter_y_pos, label = significance_letters),
-              size = 6, fontface = "bold", color = "black", vjust = 2.5) +
+              size = 6, color = "black", vjust = 2.5, family = "Arial") +
     
     # Reference line at zero
     geom_hline(yintercept = 0, linetype = "dashed", color = "red", 
@@ -134,40 +134,38 @@ create_thermal_phase_figure <- function(plot_data, title_suffix, y_label, filena
       mid = "white",        # White for neutral  
       high = "#B2182B",     # Red for warming
       midpoint = 0,
-      name = "Temperature\nDifference (°C)",
+      name = "Temperature\ndifference (°C)",
       guide = guide_colorbar(title.position = "top", title.hjust = 0.5),
       limits = c(-max_abs_temp, max_abs_temp)  # Symmetric scale
     ) +
     
-    # Labels and titles
+    # Labels
     labs(
-      title = paste("Grow Tube Temperature Effects by Thermal Phase -", title_suffix),
-      subtitle = "Letters indicate significant differences (Tukey HSD, α = 0.05) | Colors show temperature impact",
       x = "Treatment",
-      y = y_label,
-      caption = "Different letters within each panel indicate statistical significance\nBlue = cooling effect, Red = warming effect"
+      y = y_label
     ) +
     
-    # Theme and styling
-    theme_bw(base_size = 16) +
+    # Theme and styling with Arial font
+    theme_bw(base_size = 16, base_family = "Arial") +
     theme(
-      plot.title = element_text(size = 5, face = "bold", hjust = 0.5),
-      plot.subtitle = element_text(size = 5, hjust = 0.5),
-      plot.caption = element_text(size = 5, hjust = 0.5, face = "italic"),
-      axis.text.x = element_text(face = "bold", hjust = 0.5, size = 14),
-      axis.text.y = element_text(size = 14, face = "bold"),
-      axis.title = element_text(size = 18, face = "bold"),
+      # No titles, subtitles, or caption for cleanest look
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
+      plot.caption = element_blank(),
+      axis.text.x = element_text(hjust = 0.5, size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.title = element_text(size = 18),
       legend.position = "left",
-      legend.title = element_text(face = "bold", size = 15),
+      legend.title = element_text(size = 15),
       legend.text = element_text(size = 14),
       strip.background = element_rect(fill = "lightgray", color = "black"),
-      strip.text = element_text(face = "bold", size = 18),
+      strip.text = element_text(size = 18),
       panel.grid.minor = element_blank(),
       panel.border = element_rect(color = "black", linewidth = 1)
     )
   
   # Save figure
-  ggsave(filename, p, width = 16, height = 4, dpi = 500, bg = "white")
+  ggsave(filename, p, width = 16, height = 3.3, dpi = 600, bg = "white")
   
   return(p)
 }
