@@ -36,7 +36,7 @@ Temperature_Differential_Analysis/
 - `0_3_data_preparation.py` - Uses thresholds from Steps 0.1 and 0.2 to prepare final analysis dataset
 - **Output:** `grow_tube_categorized.csv` with temperature deltas and categorical assignments
 
-<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_1_Temperature_Differential_Analysis/images/img.png" alt="Thermal Conditions Grouping" width="80%">
+<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_1_Temperature_Differential_Analysis/images/img.png" alt="Thermal Conditions Grouping" width="70%">
 
 *Grouping of thermal conditions during dormancy across two seasons. (A) Yearly comparisons of daily mean air temperature, (B) diurnal temperature range, and (C) solar radiation during the study period. (D–F) Distributions of thermal variables used to define thresholds for classifying cold vs. warm days and cloudy vs. sunny conditions. (G) Diurnal patterns of mean air temperature and solar radiation for defining four-time blocks.*
 
