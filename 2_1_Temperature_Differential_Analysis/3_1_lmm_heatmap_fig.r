@@ -1,6 +1,6 @@
 # Author: Worasit Sangjan
-# Date: 7 September 2025
-# Version: 2
+# Date: 21 September 2025
+# Version: 2.1
 
 # ============================================================================
 # FIGURE GENERATION: Full factorial
@@ -47,25 +47,25 @@ clean_heatmap_data <- function(data, variable_name) {
     filter(!is.na(EMM_Original_C)) %>%
     
     mutate(
-      # Clean treatment names
+      # Clean treatment names - sentence case
       Treatment_Clean = case_when(
         Treatment == "Paper_low" ~ "Paper\nLow",
-        Treatment == "Paper_raise" ~ "Paper\nRaise", 
+        Treatment == "Paper_raise" ~ "Paper\nHigh", 
         Treatment == "Plastic_low" ~ "Plastic\nLow",
-        Treatment == "Plastic_raise" ~ "Plastic\nRaise",
+        Treatment == "Plastic_raise" ~ "Plastic\nHigh",
         TRUE ~ as.character(Treatment)
       ),
       
-      # Clean time block names with descriptive labels
+      # Clean time block names - sentence case
       Time_Block_Clean = case_when(
         grepl("Morning", Time_Block, ignore.case = TRUE) ~ "Morning\nWarming",
         grepl("Peak", Time_Block, ignore.case = TRUE) ~ "Peak\nHeat", 
-        grepl("Evening", Time_Block, ignore.case = TRUE) ~ "Evening\nCooling",
-        grepl("Night", Time_Block, ignore.case = TRUE) ~ "Night\nCold",
+        grepl("Evening", Time_Block, ignore.case = TRUE) ~ "Afternoon\nCooling",
+        grepl("Night", Time_Block, ignore.case = TRUE) ~ "Night\nPeriod",
         TRUE ~ as.character(Time_Block)
       ),
       
-      # Clean thermal phase names
+      # Clean thermal phase names - sentence case
       Thermal_Phase_Clean = case_when(
         grepl("cold.*cloudy", Thermal_Phase, ignore.case = TRUE) ~ "Cold Cloudy",
         grepl("cold.*sunny", Thermal_Phase, ignore.case = TRUE) ~ "Cold Sunny",
@@ -81,10 +81,10 @@ clean_heatmap_data <- function(data, variable_name) {
       Variable_Name = variable_name
     ) %>%
     
-    # Set proper factor ordering with descriptive names
+    # Set proper factor ordering with sentence case
     mutate(
-      Treatment_Clean = factor(Treatment_Clean, levels = c("Paper\nLow", "Paper\nRaise", "Plastic\nLow", "Plastic\nRaise")),
-      Time_Block_Clean = factor(Time_Block_Clean, levels = c("Morning\nWarming", "Peak\nHeat", "Evening\nCooling", "Night\nCold")),
+      Treatment_Clean = factor(Treatment_Clean, levels = c("Paper\nLow", "Paper\nHigh", "Plastic\nLow", "Plastic\nHigh")),
+      Time_Block_Clean = factor(Time_Block_Clean, levels = c("Morning\nWarming", "Peak\nHeat", "Afternoon\nCooling", "Night\nPeriod")),
       Thermal_Phase_Clean = factor(Thermal_Phase_Clean, levels = c("Cold Cloudy", "Cold Sunny", "Warm Cloudy", "Warm Sunny"))
     )
   
@@ -114,59 +114,58 @@ create_heatmap <- function(data, title_suffix) {
     
     # Layer 1: °C values (top - smaller, gray)
     geom_text(aes(label = sprintf("(%.3f°C)", Temperature_C)),
-              color = "gray40", size = 3.1, fontface = "bold", 
-              vjust = -2.5) +
+              color = "gray40", size = 3.1,
+              vjust = -2.5, family = "Arial") +
     
     # Layer 2: Log EMM values (center - larger, black)
     geom_text(aes(label = sprintf("%.3f", Log_EMM)),
-              color = "black", size = 3.4, fontface = "bold", 
-              vjust = 0.25) +
+              color = "black", size = 3.4,
+              vjust = 0.25, family = "Arial") +
     
     # Layer 3: Statistical groups (bottom)
     geom_text(aes(label = Statistical_Group),
-              color = "black", size = 3.6, fontface = "bold", 
-              vjust = 1.75) +
+              color = "black", size = 3.6,
+              vjust = 1.75, family = "Arial") +
     
     # Panel layout by thermal phase
     facet_grid(. ~ Thermal_Phase_Clean, scales = "free_x", space = "free_x") +
     
-    # Temperature-based color scheme
+    # Temperature-based color scheme with accessibility
     scale_fill_gradient2(
       low = "#2166AC",      # Blue for cooling
       mid = "white",        # White for neutral  
       high = "#B2182B",     # Red for warming
       midpoint = 0,
-      name = "Temperature\nDifference (°C)",
+      name = "Temperature\ndifference (°C)",
       guide = guide_colorbar(title.position = "top", title.hjust = 0.5),
       limits = c(min(-abs(max(abs(temp_range)))), max(abs(temp_range)))  # Symmetric scale
     ) +
     
     # Labels and styling
     labs(
-      title = paste("Model 3: Temperature Effects -", title_suffix),
-      subtitle = "Top: °C effects (interpretation) | Center: Log EMM (statistical) | Bottom: Statistical groups\nSame letters = not significantly different",
-      x = "Time Block",
+      x = "Time block",
       y = "Treatment"
     ) +
     
-    # Clean theme
-    theme_minimal(base_size = 11) +
+    # Clean theme with Arial font
+    theme_minimal(base_size = 11, base_family = "Arial") +
     theme(
-      plot.title = element_text(size = 5, face = "bold", hjust = 0.5),
-      plot.subtitle = element_text(size = 5, hjust = 0.5, lineheight = 1.1),
+      # No titles for cleaner look
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
       
       axis.text.x = element_text(angle = 0, hjust = 0.5, size = 12),
-      axis.text.y = element_text(size = 13, face = "bold"),
-      axis.title = element_text(size = 14, face = "bold"),
+      axis.text.y = element_text(size = 13),
+      axis.title = element_text(size = 14),
       
       panel.grid = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
       
-      strip.text = element_text(size = 13, face = "bold"),
+      strip.text = element_text(size = 13),
       strip.background = element_rect(fill = "lightgray", color = "black"),
       
       legend.position = "left",
-      legend.title = element_text(face = "bold", size = 12),
+      legend.title = element_text(size = 12),
       legend.text = element_text(size = 12),
       
       panel.spacing = unit(0.3, "cm"),
@@ -184,14 +183,14 @@ create_heatmap <- function(data, title_suffix) {
 cat("\nCreating Delta_Ta heatmap...\n")
 p_ta <- create_heatmap(ta_clean, "ΔTa (Tube - Air)")
 ggsave("Temperature_Effects_Delta_Ta_Model3.png", p_ta, 
-       width = 12, height = 4.75, dpi = 500, bg = "white")
+       width = 12, height = 4.75, dpi = 600, bg = "white")
 cat("Saved: Temperature_Effects_Delta_Ta_Model3.png\n")
 
 # Create Delta_Tn heatmap
 cat("Creating Delta_Tn heatmap...\n")
 p_tn <- create_heatmap(tn_clean, "ΔTn (Tube - No-tube)")
 ggsave("Temperature_Effects_Delta_Tn_Model3.png", p_tn, 
-       width = 12, height = 4.75, dpi = 500, bg = "white")
+       width = 12, height = 4.75, dpi = 600, bg = "white")
 cat("Saved: Temperature_Effects_Delta_Tn_Model3.png\n")
 
 # ============================================================================
