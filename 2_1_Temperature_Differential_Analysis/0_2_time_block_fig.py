@@ -109,7 +109,7 @@ def create_time_block_figure(hourly_stats: pd.DataFrame, weather_df: pd.DataFram
     """Create comprehensive time block analysis figure."""
     print("Creating time block figure...")
     
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(7.25, 9.5))
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(7.25, 8.5))
     
     # Prepare hourly data for circular plot (add hour 24 = hour 0)
     hourly_plot = hourly_stats.copy()
@@ -153,13 +153,13 @@ def create_time_block_figure(hourly_stats: pd.DataFrame, weather_df: pd.DataFram
     
     # Time block labels
     time_labels = [
-        ("Morning warming | 07-11", 7),
-        ("Peak heat | 11-15", 11),
-        ("Afternoon cooling | 15-19", 15),
-        ("Night period | 19-07", 19)
+        ("Morning Warming | 07-11", 7),
+        ("Peak Heat | 11-15", 11),
+        ("Afternoon Cooling | 15-19", 15),
+        ("Night Period | 19-07", 19)
     ]
     for label, hour in time_labels:
-        ax1.text(hour + 0.25, 17, label, rotation=90, ha="left", va="top",
+        ax1.text(hour + 0.25, 20, label, rotation=90, ha="left", va="top",
                  fontsize=8, color="gray", alpha=0.7)
     
     # Legend
