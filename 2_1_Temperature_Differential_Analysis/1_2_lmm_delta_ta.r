@@ -1,6 +1,6 @@
 # Author: Worasit Sangjan
-# Date: September 5, 2025
-# Version 2
+# Date: September 21, 2025
+# Version 2.1
 
 # ============================================================================
 # LINEAR MIXED-EFFECTS MODEL ANALYSIS FOR GROW TUBE TEMPERATURE EFFECTS
@@ -32,6 +32,10 @@ df <- df[df$Material != "Uncover", ]
 # Create factor variables
 df$treatment <- as.factor(paste(df$Material, df$Condition, sep="_"))
 df$tube_id <- as.factor(paste(df$treatment, "Rep", df$Replicate, sep="_"))
+
+# Extract date from timestamp (actual format: 2023-10-25 00:00:00)
+df$date <- as.Date(df$timestamp, format = "%Y-%m-%d %H:%M:%S")
+
 df$date_factor <- as.factor(df$date)
 df$thermal_phase <- as.factor(df$thermal_phase)
 df$time_block <- as.factor(df$time_block)
