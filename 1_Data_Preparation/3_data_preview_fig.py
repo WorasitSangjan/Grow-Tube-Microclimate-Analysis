@@ -31,9 +31,9 @@ def load_and_validate_data(file_path: str, start_date: str = "2024-10-25") -> pd
     
     combinations = df.groupby(['Material', 'Condition', 'Replicate']).size()
     
-    print(f"Date range: {df['datetime'].min()} to {df['datetime'].max()}")
-    print(f"Total records: {len(df):,}")
-    print(f"Unique combinations: {len(combinations)}")
+    print(f"✓ Date range: {df['datetime'].min()} to {df['datetime'].max()}")
+    print(f"✓ Total records: {len(df):,}")
+    print(f"✓ Unique combinations: {len(combinations)}")
     
     return df
 
@@ -41,9 +41,9 @@ def get_treatment_info(df: pd.DataFrame) -> dict:
     """Get treatment combination information."""
     title_mapping = {
         ('Paper', 'low'): 'Paper Low',
-        ('Paper', 'raise'): 'Paper Raise', 
+        ('Paper', 'raise'): 'Paper High', 
         ('Plastic', 'low'): 'Plastic Low',
-        ('Plastic', 'raise'): 'Plastic Raise',
+        ('Plastic', 'raise'): 'Plastic High',
         ('Uncover', 'uncover'): 'No-Tube'
     }
     
@@ -66,6 +66,9 @@ def create_monthly_plots(df: pd.DataFrame) -> None:
     
     colors = ['red', 'green', 'blue', 'purple']
     
+    # Set Arial font globally
+    plt.rcParams['font.family'] = 'Arial'
+    
     for _, combo in combinations.iterrows():
         material, condition = combo['Material'], combo['Condition']
         combo_data = df[(df['Material'] == material) & (df['Condition'] == condition)]
@@ -86,7 +89,7 @@ def create_monthly_plots(df: pd.DataFrame) -> None:
             if len(month_data) == 0:
                 ax.text(0.5, 0.5, f'No data for {month}', 
                        ha='center', va='center', transform=ax.transAxes)
-                ax.set_title(f"{month}", fontsize=12, fontweight='bold')
+                ax.set_title(f"{month}", fontsize=12, fontweight='normal')
                 continue
             
             # Plot replicates
@@ -105,12 +108,12 @@ def create_monthly_plots(df: pd.DataFrame) -> None:
             
             # Format subplot
             ax.set_title(f"{month} - {title_mapping.get((material, condition), f'{material} {condition}')}", 
-                        fontsize=12, fontweight='bold')
-            ax.set_ylabel("Temperature (°C)")
+                        fontsize=12, fontweight='normal', fontfamily='Arial')
+            ax.set_ylabel("Temperature (°C)", fontfamily='Arial')
             ax.grid(True, alpha=0.3)
             
-            # Format x-axis
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
+            # Format x-axis with new date format
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=5))
             
             # Set limits
@@ -123,8 +126,8 @@ def create_monthly_plots(df: pd.DataFrame) -> None:
         # Final formatting
         treatment_title = title_mapping.get((material, condition), f"{material} - {condition}")
         plt.suptitle(f"Temperature Data: {treatment_title}", 
-                    fontsize=16, fontweight='bold', y=0.98)
-        plt.xlabel("Date")
+                    fontsize=16, fontweight='normal', y=0.98, fontfamily='Arial')
+        plt.xlabel("Date", fontfamily='Arial')
         plt.tight_layout()
         plt.subplots_adjust(top=0.95)
         plt.show()
@@ -135,11 +138,14 @@ def create_summary_plot(df: pd.DataFrame) -> None:
     
     combinations, title_mapping = get_treatment_info(df)
     colors = ['red', 'green', 'blue', 'purple']
-    
+
+    # Set Arial font globally
+    plt.rcParams['font.family'] = 'Arial'
+
     fig, axes = plt.subplots(len(combinations), 1, figsize=(16, 5 * len(combinations)))
     if len(combinations) == 1:
         axes = [axes]
-    
+
     for i, (_, combo) in enumerate(combinations.iterrows()):
         material, condition = combo['Material'], combo['Condition']
         combo_data = df[(df['Material'] == material) & (df['Condition'] == condition)]
@@ -151,26 +157,26 @@ def create_summary_plot(df: pd.DataFrame) -> None:
         for j, rep in enumerate(replicates):
             rep_data = combo_data[combo_data['Replicate'] == rep]
             ax.plot(rep_data["datetime"], rep_data["Value"], 
-                   label=f"Rep {rep}", color=colors[j % len(colors)], 
-                   linewidth=1, alpha=0.7)
+                label=f"Rep {rep}", color=colors[j % len(colors)], 
+                linewidth=1, alpha=0.7)
         
         # Plot air temperature
         ax.plot(combo_data["datetime"], combo_data["air_temp_C"], 
-               label="Air Temp", color="black", linewidth=1, linestyle='--')
+            label="Air Temp", color="black", linewidth=1, linestyle='--')
         
         # Formatting
         treatment_title = title_mapping.get((material, condition), f"{material} - {condition}")
-        ax.set_title(treatment_title, fontsize=23, fontweight='bold')
-        ax.set_ylabel("Temperature (°C)", fontsize=21, fontweight='bold')
+        ax.set_title(treatment_title, fontsize=23, fontweight='normal', fontfamily='Arial')
+        ax.set_ylabel("Temperature (°C)", fontsize=21, fontweight='normal', fontfamily='Arial')
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=17, ncol=5)
         ax.tick_params(axis='both', labelsize=15)
         
-        # Format x-axis
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
+        # Format x-axis with new date format
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
-    
-    plt.xlabel("Date", fontsize=18, fontweight='bold')
+
+    plt.xlabel("Date", fontsize=18, fontweight='normal', fontfamily='Arial')
     plt.tight_layout()
     plt.show()
 
@@ -192,7 +198,7 @@ def filter_data_by_date(input_file: str, output_file: str, start_date: str = "20
     
     # Save
     filtered_df.to_csv(output_file, index=False)
-    print(f"Saved to: {output_file}")
+    print(f"✓ Saved to: {output_file}")
     
     return output_file
 
@@ -225,7 +231,7 @@ def preview_temperature_data(input_file: str = "merged_data_2025.csv",
     if create_summary:
         create_summary_plot(df)
     
-    print("\nPreview complete!")
+    print("\n✓ Preview complete!")
 
 # ============================================================================
 # USAGE
