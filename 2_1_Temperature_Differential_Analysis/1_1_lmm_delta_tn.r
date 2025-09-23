@@ -129,14 +129,17 @@ cat("*** SELECTED:", best_transformation, "transformation (lowest AIC =", round(
 # ============================================================================
 
 # Original data diagnostics
-png("Diagnostic_Plots_Original_vs_Selected_delta_Tn.png", width = 3600, height = 2400, res = 250)
+png("Diagnostic_Plots_Original_vs_Selected_delta_Tn.png", width = 3600, height = 2400, res = 350)
 par(mfrow = c(2, 3), 
     mar = c(5, 5, 4, 2),
-    cex.main = 1.8,
+    cex.main = 1.7,
     cex.lab = 1.5,
     cex.axis = 1.3,
-    font.main = 2,
-    font.lab = 2)
+    font.main = 1,
+    font.lab = 1)
+
+# Set global font family to Arial
+par(family = "Arial")    
 
 # Original data plots
 plot(fitted(model_original), resid(model_original), 
@@ -347,11 +350,3 @@ cat("Best model (lowest AIC):", combined_results$Model[combined_results$AIC_Rank
 cat("\nFiles generated:\n")
 cat("1. Combined_LMM_Delta_Tn_Complete_Results.csv - Complete results with diagnostics\n")
 cat("2. Diagnostic_Plots_Original_vs_Selected_delta_Tn.png - Model diagnostic comparison\n")
-
-cat("\nCombined results include:\n")
-cat("- EMM, SE, confidence intervals, and statistical groups for all models\n")
-cat("- AIC values for all transformations (unified assessment)\n")
-cat("- Residual and random effects normality tests\n")
-cat("- ICC (Intraclass Correlation Coefficient)\n")
-cat("- Type III test significance levels\n")
-cat("- Model ranking based on AIC\n")
