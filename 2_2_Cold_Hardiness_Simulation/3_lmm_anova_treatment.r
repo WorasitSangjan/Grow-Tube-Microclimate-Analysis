@@ -1,5 +1,6 @@
 # Author: Worasit Sangjan
-# Date: July 7, 2025
+# Date: September 29, 2025
+# Version 2.2
 
 # ============================================================================
 # COLD HARDINESS ANALYSIS - BY TREATMENT
@@ -9,8 +10,8 @@
 # ============================================================================
 # USER CONFIGURATION
 # ============================================================================
-SEASON_TO_ANALYZE <- "2024-2025"  # Change to desired season
-ANALYSIS_TYPE <- "by_treatment"   # Comparing varieties within treatments
+SEASON_TO_ANALYZE <- "2024-2025"
+ANALYSIS_TYPE <- "by_treatment"
 
 cat("===============================================================\n")
 cat("COLD HARDINESS ANALYSIS - BY TREATMENT\n")
@@ -35,17 +36,14 @@ for(pkg in required_packages) {
 # ============================================================================
 cat("\n=== LOADING DATA ===\n")
 
-# Load data files
 dynamic_file <- paste0("dynamic_slopes_", ANALYSIS_TYPE, ".csv")
 winter_file <- paste0("winter_means_", ANALYSIS_TYPE, ".csv")
 df_dynamic <- read.csv(dynamic_file)
 df_winter <- read.csv(winter_file)
 
-# Filter by season
 df_dynamic_season <- df_dynamic[df_dynamic$Season == SEASON_TO_ANALYZE, ]
 df_winter_season <- df_winter[df_winter$Season == SEASON_TO_ANALYZE, ]
 
-# Rename treatments
 df_dynamic_season$Treatment <- gsub("Uncover_uncover", "No-Tube", df_dynamic_season$Treatment)
 df_dynamic_season$Treatment <- gsub("Paper_raise", "Paper_high", df_dynamic_season$Treatment)
 df_dynamic_season$Treatment <- gsub("Plastic_raise", "Plastic_high", df_dynamic_season$Treatment)
@@ -54,11 +52,9 @@ df_winter_season$Treatment <- gsub("Uncover_uncover", "No-Tube", df_winter_seaso
 df_winter_season$Treatment <- gsub("Paper_raise", "Paper_high", df_winter_season$Treatment)
 df_winter_season$Treatment <- gsub("Plastic_raise", "Plastic_high", df_winter_season$Treatment)
 
-# Set factor levels
 treatment_order <- c("Paper_low", "Paper_high", "No-Tube", "Plastic_low", "Plastic_high")
 variety_order <- c("Cabernet Sauvignon", "Chardonnay", "Concord", "Mourvedre")
 
-# Convert to factors
 factor_cols <- c("Season", "Variety", "Treatment", "Phase", "Replicate")
 for(col in factor_cols) {
   if(col %in% colnames(df_dynamic_season)) {
@@ -81,7 +77,6 @@ for(col in factor_cols) {
   }
 }
 
-# Create vine ID and directories
 df_dynamic_season$Vine_ID <- with(df_dynamic_season, paste(Variety, Treatment, Replicate, sep = "_"))
 results_dir <- paste0("results_", SEASON_TO_ANALYZE, "_by_treatment")
 plots_dir <- paste0("plots_", SEASON_TO_ANALYZE, "_by_treatment")
@@ -96,15 +91,12 @@ cat("Winter data loaded:", nrow(df_winter_season), "mean hardiness observations\
 # ANALYSIS FUNCTIONS
 # ============================================================================
 
-# Function to test transformations (without Box-Cox)
 test_transformations <- function(treatment_data, control_opts) {
   transformation_results <- list()
   
-  # 1. Original (untransformed) model
   model_original <- lmer(Slope_C_per_day ~ Variety * Phase + (1|Replicate), 
                         data = treatment_data, REML = FALSE, control = control_opts)
   
-  # 2. Log transformation (shift for negative values)
   min_slope <- min(treatment_data$Slope_C_per_day, na.rm = TRUE)
   shift_value <- abs(min_slope) + 0.001
   treatment_data$Slope_log <- log(treatment_data$Slope_C_per_day + shift_value)
@@ -114,7 +106,6 @@ test_transformations <- function(treatment_data, control_opts) {
          data = treatment_data, REML = FALSE, control = control_opts)
   }, error = function(e) NULL)
   
-  # 3. Square root transformation
   treatment_data$Slope_sqrt <- sqrt(treatment_data$Slope_C_per_day + shift_value)
   
   model_sqrt <- tryCatch({
@@ -122,7 +113,6 @@ test_transformations <- function(treatment_data, control_opts) {
          data = treatment_data, REML = FALSE, control = control_opts)
   }, error = function(e) NULL)
   
-  # 4. Cube root transformation
   treatment_data$Slope_cbrt <- sign(treatment_data$Slope_C_per_day) * abs(treatment_data$Slope_C_per_day)^(1/3)
   
   model_cbrt <- tryCatch({
@@ -130,7 +120,6 @@ test_transformations <- function(treatment_data, control_opts) {
          data = treatment_data, REML = FALSE, control = control_opts)
   }, error = function(e) NULL)
   
-  # Store results
   transformation_results$original <- list(
     model = model_original,
     aic = AIC(model_original),
@@ -166,7 +155,6 @@ test_transformations <- function(treatment_data, control_opts) {
   return(transformation_results)
 }
 
-# Function to save diagnostics
 save_diagnostics <- function(treatment, results, transformation_results, file_path) {
   sink(file_path)
   
@@ -212,19 +200,17 @@ save_diagnostics <- function(treatment, results, transformation_results, file_pa
 # ============================================================================
 cat("\n=== RUNNING ANALYSIS ===\n")
 
-# Model control
 control_opts <- lmerControl(
   optimizer = "bobyqa",
   optCtrl = list(maxfun = 2e5),
   calc.derivs = FALSE
 )
 
-# Initialize results
 dynamic_results <- list()
 winter_results <- list()
 treatments <- levels(df_dynamic_season$Treatment)
 
-# Dynamic analysis for each treatment
+# Dynamic analysis
 for(treatment in treatments) {
   cat("Analyzing dynamic phases for", treatment, "\n")
   treatment_data <- df_dynamic_season[df_dynamic_season$Treatment == treatment, ]
@@ -234,16 +220,13 @@ for(treatment in treatments) {
     next
   }
   
-  # Test transformations
   transformation_results <- test_transformations(treatment_data, control_opts)
   
-  # Use original model for interpretation
   model <- transformation_results$original$model
-  emm <- emmeans(model, ~ Variety | Phase)  # Compare varieties within phases
+  emm <- emmeans(model, ~ Variety | Phase)
   pairs_result <- pairs(emm, adjust = "tukey")
   cld_result <- cld(emm, Letters = letters, decreasing = TRUE)
   
-  # Diagnostics
   model_residuals <- residuals(model)
   fitted_values <- fitted(model)
   random_effects <- ranef(model)$Replicate[,1]
@@ -263,12 +246,11 @@ for(treatment in treatments) {
     shapiro_random = shapiro_random
   )
   
-  # Save diagnostics
   lmm_diagnostic_file <- paste0(results_dir, "/LMM_Diagnostics_", gsub("_", "-", treatment), ".txt")
   save_diagnostics(treatment, dynamic_results[[treatment]], transformation_results, lmm_diagnostic_file)
 }
 
-# Winter analysis for each treatment
+# Winter analysis with HSD groups
 for(treatment in treatments) {
   cat("Analyzing winter maintenance for", treatment, "\n")
   treatment_winter <- df_winter_season[df_winter_season$Treatment == treatment, ]
@@ -278,18 +260,29 @@ for(treatment in treatments) {
     next
   }
   
-  # ANOVA model
   anova_model <- aov(Mean_Hardiness ~ Variety, data = treatment_winter)
   
-  # Emmeans analysis
-  emm_winter <- emmeans(anova_model, ~ Variety)  # Compare varieties within treatment
+  emm_winter <- emmeans(anova_model, ~ Variety)
   pairs_winter <- pairs(emm_winter, adjust = "tukey")
   cld_winter <- cld(emm_winter, Letters = letters, decreasing = TRUE)
   
-  # Assumption checks
+  tukey_result <- TukeyHSD(anova_model)
+  hsd_groups <- HSD.test(anova_model, "Variety")
+  
+  descriptive_stats <- treatment_winter %>%
+    group_by(Variety) %>%
+    summarise(
+      n = n(),
+      mean = mean(Mean_Hardiness),
+      sd = sd(Mean_Hardiness),
+      se = sd(Mean_Hardiness) / sqrt(n()),
+      .groups = 'drop'
+    )
+  
   residuals_anova <- residuals(anova_model)
   shapiro_test <- shapiro.test(residuals_anova)
   levene_test <- car::leveneTest(Mean_Hardiness ~ Variety, data = treatment_winter)
+  bartlett_test <- bartlett.test(Mean_Hardiness ~ Variety, data = treatment_winter)
   
   winter_results[[treatment]] <- list(
     model = anova_model,
@@ -297,11 +290,64 @@ for(treatment in treatments) {
     pairs = pairs_winter,
     cld = cld_winter,
     summary = summary(anova_model),
+    tukey = tukey_result,
+    hsd_groups = hsd_groups,
+    means = aggregate(Mean_Hardiness ~ Variety, treatment_winter, mean),
+    descriptive_stats = descriptive_stats,
     raw_data = treatment_winter,
     residuals = residuals_anova,
     shapiro_test = shapiro_test,
-    levene_test = levene_test
+    levene_test = levene_test,
+    bartlett_test = bartlett_test
   )
+  
+  diagnostic_file <- paste0(results_dir, "/Winter_Diagnostics_", gsub("_", "-", treatment), ".txt")
+  sink(diagnostic_file)
+  
+  cat("=== WINTER ANALYSIS DIAGNOSTICS FOR", toupper(treatment), "===\n\n")
+  
+  cat("DESCRIPTIVE STATISTICS:\n")
+  print(descriptive_stats)
+  
+  cat("\n\nANOVA ASSUMPTIONS:\n")
+  cat("1. NORMALITY OF RESIDUALS (Shapiro-Wilk test):\n")
+  cat("   W =", shapiro_test$statistic, ", p-value =", shapiro_test$p.value, "\n")
+  cat("   Interpretation:", ifelse(shapiro_test$p.value > 0.05, "NORMAL (p > 0.05)", "NON-NORMAL (p <= 0.05)"), "\n\n")
+  
+  cat("2. HOMOGENEITY OF VARIANCE:\n")
+  cat("   Levene Test: F =", levene_test[1,2], ", p-value =", levene_test[1,3], "\n")
+  cat("   Interpretation:", ifelse(levene_test[1,3] > 0.05, "EQUAL VARIANCES (p > 0.05)", "UNEQUAL VARIANCES (p <= 0.05)"), "\n")
+  cat("   Bartlett Test: Chi-sq =", bartlett_test$statistic, ", p-value =", bartlett_test$p.value, "\n")
+  cat("   Interpretation:", ifelse(bartlett_test$p.value > 0.05, "EQUAL VARIANCES (p > 0.05)", "UNEQUAL VARIANCES (p <= 0.05)"), "\n\n")
+  
+  cat("3. RESIDUAL ANALYSIS:\n")
+  cat("   Range of residuals:", range(residuals_anova)[1], "to", range(residuals_anova)[2], "\n")
+  cat("   Mean of residuals:", mean(residuals_anova), "\n")
+  cat("   SD of residuals:", sd(residuals_anova), "\n\n")
+  
+  cat("ANOVA RESULTS:\n")
+  print(summary(anova_model))
+  
+  cat("\n\nTUKEY HSD P-VALUES:\n")
+  print(tukey_result)
+  
+  cat("\n\nEMMEANS CLD GROUPINGS:\n")
+  print(cld_winter)
+  
+  cat("\n\nHSD GROUPINGS (agricolae):\n")
+  print(hsd_groups$groups)
+  
+  cat("\n\nHSD STATISTICS:\n")
+  cat("Alpha level:", hsd_groups$alpha, "\n")
+  cat("HSD value:", hsd_groups$HSD, "\n")
+  cat("F-statistic:", hsd_groups$statistics$F, "\n")
+  cat("P-value:", hsd_groups$statistics$P, "\n")
+  
+  cat("\n\nRAW DATA CHECK:\n")
+  print(treatment_winter[, c("Variety", "Mean_Hardiness")])
+  
+  sink()
+  cat("Saved diagnostics for", treatment, "to", diagnostic_file, "\n")
 }
 
 # ============================================================================
@@ -309,19 +355,16 @@ for(treatment in treatments) {
 # ============================================================================
 cat("\n=== CREATING VISUALIZATION ===\n")
 
-# Define variety colors
 variety_colors <- c(
-  "Chardonnay" = "#1f77b4",           # Blue
-  "Cabernet Sauvignon" = "#2ca02c",   # Green  
-  "Concord" = "#ff7f0e",              # Orange
-  "Mourvedre" = "#d62728"             # Red
+  "Chardonnay" = "#1f77b4",
+  "Cabernet Sauvignon" = "#2ca02c",
+  "Concord" = "#ff7f0e",
+  "Mourvedre" = "#d62728"
 )
 
-# Prepare raw data for boxplots
 prepare_raw_data <- function() {
   all_raw_data <- data.frame()
   
-  # Fall data
   fall_data <- df_dynamic_season[df_dynamic_season$Phase %in% unique(df_dynamic_season$Phase)[grepl("fall", unique(df_dynamic_season$Phase), ignore.case = TRUE)], ]
   if(nrow(fall_data) > 0) {
     fall_processed <- fall_data %>%
@@ -334,7 +377,6 @@ prepare_raw_data <- function() {
     all_raw_data <- rbind(all_raw_data, fall_processed[, c("Variety", "Treatment", "Phase_Name", "Y_Value", "Y_Label", "Replicate")])
   }
   
-  # Winter data
   winter_processed <- df_winter_season %>%
     dplyr::select(Variety, Treatment, Mean_Hardiness, Replicate) %>%
     dplyr::mutate(
@@ -344,7 +386,6 @@ prepare_raw_data <- function() {
     )
   all_raw_data <- rbind(all_raw_data, winter_processed[, c("Variety", "Treatment", "Phase_Name", "Y_Value", "Y_Label", "Replicate")])
   
-  # Spring data
   spring_data <- df_dynamic_season[df_dynamic_season$Phase %in% unique(df_dynamic_season$Phase)[grepl("spring", unique(df_dynamic_season$Phase), ignore.case = TRUE)], ]
   if(nrow(spring_data) > 0) {
     spring_processed <- spring_data %>%
@@ -357,7 +398,6 @@ prepare_raw_data <- function() {
     all_raw_data <- rbind(all_raw_data, spring_processed[, c("Variety", "Treatment", "Phase_Name", "Y_Value", "Y_Label", "Replicate")])
   }
   
-  # Set factor levels
   all_raw_data$Phase_Name <- factor(all_raw_data$Phase_Name, 
                                    levels = c("Fall Acclimation", "Winter Maintenance", "Spring Deacclimation"))
   all_raw_data$Variety <- factor(all_raw_data$Variety, levels = variety_order)
@@ -366,13 +406,12 @@ prepare_raw_data <- function() {
   return(all_raw_data)
 }
 
-# Function to get statistical letters
 get_statistical_letters <- function(phase_name) {
   letters_data <- data.frame()
   
   for(treatment in treatments) {
     if(phase_name == "Winter Maintenance") {
-      if(!is.null(winter_results[[treatment]])) {
+      if(treatment %in% names(winter_results)) {
         cld_df <- as.data.frame(winter_results[[treatment]]$cld)
         treatment_letters <- data.frame(
           Treatment = treatment,
@@ -383,7 +422,7 @@ get_statistical_letters <- function(phase_name) {
         letters_data <- rbind(letters_data, treatment_letters)
       }
     } else {
-      if(!is.null(dynamic_results[[treatment]])) {
+      if(treatment %in% names(dynamic_results)) {
         cld_df <- as.data.frame(dynamic_results[[treatment]]$cld)
         
         if("Phase" %in% colnames(cld_df)) {
@@ -413,7 +452,6 @@ get_statistical_letters <- function(phase_name) {
     return(data.frame())
   }
   
-  # Calculate x positions
   letters_data$Variety <- factor(letters_data$Variety, levels = variety_order)
   letters_data$Treatment <- factor(letters_data$Treatment, levels = treatment_order)
   
@@ -435,7 +473,6 @@ get_statistical_letters <- function(phase_name) {
   return(letters_data)
 }
 
-# Create plots
 create_combined_plot <- function() {
   raw_data <- prepare_raw_data()
   phases <- c("Fall Acclimation", "Winter Maintenance", "Spring Deacclimation")
@@ -447,12 +484,10 @@ create_combined_plot <- function() {
     phase_data <- raw_data[raw_data$Phase_Name == phases[i], ]
     letters_data <- get_statistical_letters(phases[i])
     
-    # Calculate max values for letter positioning
     max_values <- phase_data %>%
       group_by(Treatment, Variety) %>%
       summarise(max_val = max(Y_Value, na.rm = TRUE), .groups = "drop")
     
-    # Position letters
     letters_positioned <- data.frame()
     if(nrow(letters_data) > 0) {
       letters_positioned <- merge(letters_data, max_values, by = c("Treatment", "Variety"))
@@ -485,18 +520,16 @@ create_combined_plot <- function() {
       ) +
       scale_y_continuous(expand = expansion(mult = c(0.02, 0.15)))
     
-    # Add letters if available
-    # if(nrow(letters_positioned) > 0) {
-    #   p <- p + geom_text(data = letters_positioned, 
-    #             aes(x = x_position, y = y_position, label = .group),
-    #             size = 8, family = "Arial", vjust = 0, color = "black",
-    #             inherit.aes = FALSE)
-    # }
+    if(nrow(letters_positioned) > 0) {
+      p <- p + geom_text(data = letters_positioned, 
+                aes(x = x_position, y = y_position, label = .group),
+                size = 8, family = "Arial", vjust = 0, color = "black",
+                inherit.aes = FALSE)
+    }
     
     plot_list[[i]] <- p
   }
   
-  # Create shared legend with proper spacing
   legend_plot <- ggplot(raw_data, aes(x = Treatment, y = Y_Value, fill = Variety)) +
     geom_boxplot() +
     scale_fill_manual(values = variety_colors, name = "",
@@ -509,15 +542,13 @@ create_combined_plot <- function() {
           legend.box.spacing = unit(0.8, "cm")) +
     guides(fill = guide_legend(nrow = 1, byrow = TRUE))
   
-  # Extract legend
   legend <- ggplotGrob(legend_plot)$grobs[[which(sapply(ggplotGrob(legend_plot)$grobs, function(x) x$name) == "guide-box")]]
   
-  # Combine plots
   combined_plot <- grid.arrange(
     plot_list[[1]], plot_list[[2]], plot_list[[3]],
     legend,
     ncol = 3, nrow = 2,
-    heights = c(4, 0.4),
+    heights = c(4, 0.8),
     layout_matrix = rbind(c(1, 2, 3),
                          c(4, 4, 4))
   )
@@ -525,7 +556,6 @@ create_combined_plot <- function() {
   return(combined_plot)
 }
 
-# Create and save plot
 combined_plot <- create_combined_plot()
 
 plot_filename <- paste0(plots_dir, "/Cold_Hardiness_", SEASON_TO_ANALYZE, ".png")
