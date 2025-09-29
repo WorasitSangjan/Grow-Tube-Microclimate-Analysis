@@ -30,7 +30,7 @@ This section analyzes cold hardiness dynamics in grape cultivars under different
   - Individual variety comparison plots (predicted hardiness vs. ambient temperature)
   - Treatment-based comparison plots (all varieties within each treatment)
 
-<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_2_Cold_Hardiness_Simulation/images/example_plot.png" alt="Cold Hardiness Dynamics" width="70%">
+<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_2_Cold_Hardiness_Simulation/images/img.png" alt="Cold Hardiness Dynamics" width="90%">
 
 *Example cold hardiness dynamics showing predicted hardiness trajectories for different treatments alongside ambient temperature extremes across the dormancy period.*
 
