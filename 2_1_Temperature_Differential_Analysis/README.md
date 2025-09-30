@@ -1,4 +1,4 @@
-# Temperature Differential Analysis
+# Section 2.1: Temperature Differential Analysis
 
 ## Overview
 
