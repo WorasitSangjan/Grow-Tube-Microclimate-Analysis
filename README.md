@@ -8,9 +8,9 @@ This repository contains the complete analytical workflow for studying the therm
 
 ## Experimental Setup
 
-<img src="images/experimental_setup.png" alt="Experimental Setup" width="90%">
+<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/images/img_1.png" alt="Experimental Setup" width="70%">
 
-*Field experimental setup showing (A) different grow tube treatments and (b) sensor installation.*
+*Field experimental setup showing (A) different grow tube treatments and (B) sensor installation.*
 
 ## Research Objectives
 
@@ -33,7 +33,7 @@ Grow-Tube-Microclimate-Analysis/
 
 ## Analysis Pipeline
 
-<img src="images/workflow_diagram.png" alt="Analysis Workflow" width="100%">
+<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/images/img_2.png" alt="Analysis Workflow" width="80%">
 
 *Data analysis workflow.*
 
@@ -108,9 +108,9 @@ Integration of physiological and traditional thermal metrics:
 
 | Material | Installation | Code |
 |----------|-------------|------|
-| White paper | At soil level | Paper Low |
+| White paper | Buried  | Paper Low |
 | White paper | Raised | Paper High |
-| Beige plastic (double-wall) | At soil level | Plastic Low |
+| Beige plastic (double-wall) | Buried  | Plastic Low |
 | Beige plastic (double-wall) | Raised | Plastic High |
 | None | - | No-Tube |
 
