@@ -1,5 +1,12 @@
 # Grow Tube Microclimate Analysis
 
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![R](https://img.shields.io/badge/R-4.0+-blue.svg)
+![Agriculture](https://img.shields.io/badge/Agriculture-Precision%20Viticulture-green.svg)
+![Research](https://img.shields.io/badge/Research-USDA--ARS-navy.svg)
+
 Repository for the research paper: **"Grow Tube Material Selection Influences Thermal Microenvironments and Cold Hardiness Risk in Dormant Grapevines"**
 
 ## Overview
