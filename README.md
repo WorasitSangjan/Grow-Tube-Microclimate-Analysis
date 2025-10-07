@@ -24,7 +24,7 @@ This repository contains the complete analytical workflow for studying the therm
 1. **Quantify thermal modifications** - Assess how different grow tube configurations alter internal temperatures relative to ambient conditions and no-tube controls
 2. **Model physiological risk** - Simulate cold hardiness dynamics to assess deacclimation risk across grape cultivars
 3. **Evaluate dormancy implications** - Analyze impacts on chilling unit and growing degree day accumulation
-4. 
+
 ## Repository Structure
 
 ```
@@ -183,7 +183,7 @@ Rscript 1_chilling_gdd_analysis.r
 
 ## Data Availability
 
-Raw temperature data and weather station records are available on ...
+Raw temperature data and weather station records are available on ... (Coming Soon!)
 
 ## Citation
 
