@@ -44,7 +44,7 @@ This section analyzes chilling unit accumulation and growing degree day (GDD) pa
 - `results_YYYY_YYYY_chill_gdd/Combined_CU_GDD_Analysis_Results_YYYY_YYYY.csv` - Statistical results
 - `plots_YYYY_YYYY_chill_gdd/Chilling_GDD_Analysis_YYYY_YYYY.png` - Three-panel visualization
 
-<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_3_Chilling_GDD_Analysis/images/img.png" alt="Cold Hardiness Dynamics" width="90%">
+<img src="https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/2_3_Chilling_GDD_Analysis/images/img.svg" alt="Cold Hardiness Dynamics" width="90%">
 
 *Cumulative chilling and growing degree day (GDD) metrics for four grapevine cultivars under five grow tube treatments during two dormancy seasons: (A) 2023–2024 and (B) 2024–2025.*
 
