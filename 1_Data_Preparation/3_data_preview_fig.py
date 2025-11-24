@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 # CORE FUNCTIONS
 # ============================================================================
 
-def load_and_validate_data(file_path: str, start_date: str = "2024-10-25") -> pd.DataFrame:
+def load_and_validate_data(file_path: str, start_date: str = "2023-10-25") -> pd.DataFrame:
     """Load and validate temperature data."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {file_path} not found")
@@ -40,10 +40,10 @@ def load_and_validate_data(file_path: str, start_date: str = "2024-10-25") -> pd
 def get_treatment_info(df: pd.DataFrame) -> dict:
     """Get treatment combination information."""
     title_mapping = {
-        ('Paper', 'low'): 'Paper Low',
-        ('Paper', 'raise'): 'Paper High', 
-        ('Plastic', 'low'): 'Plastic Low',
-        ('Plastic', 'raise'): 'Plastic High',
+        ('Paper', 'low'): 'Paper Buried',
+        ('Paper', 'raise'): 'Paper Raised', 
+        ('Plastic', 'low'): 'Plastic Buried',
+        ('Plastic', 'raise'): 'Plastic Raised',
         ('Uncover', 'uncover'): 'No-Tube'
     }
     
@@ -162,14 +162,15 @@ def create_summary_plot(df: pd.DataFrame) -> None:
         
         # Plot air temperature
         ax.plot(combo_data["datetime"], combo_data["air_temp_C"], 
-            label="Air Temp", color="black", linewidth=1, linestyle='--')
+            label="Ambient Air", color="black", linewidth=1, linestyle='--')
         
         # Formatting
         treatment_title = title_mapping.get((material, condition), f"{material} - {condition}")
         ax.set_title(treatment_title, fontsize=23, fontweight='normal', fontfamily='Arial')
         ax.set_ylabel("Temperature (°C)", fontsize=21, fontweight='normal', fontfamily='Arial')
+        ax.set_ylim(-25, 50)
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=17, ncol=5)
+        ax.legend(fontsize=17, loc='upper left', ncol=5)
         ax.tick_params(axis='both', labelsize=15)
         
         # Format x-axis with new date format
@@ -180,7 +181,7 @@ def create_summary_plot(df: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.show()
 
-def filter_data_by_date(input_file: str, output_file: str, start_date: str = "2024-10-25") -> str:
+def filter_data_by_date(input_file: str, output_file: str, start_date: str = "2023-10-25") -> str:
     """Filter data from start date and save to new file."""
     print(f"Filtering data from {start_date}...")
     
@@ -206,8 +207,8 @@ def filter_data_by_date(input_file: str, output_file: str, start_date: str = "20
 # MAIN WORKFLOW
 # ============================================================================
 
-def preview_temperature_data(input_file: str = "merged_data_2025.csv", 
-                           start_date: str = "2024-10-25",
+def preview_temperature_data(input_file: str = "merged_data_2024.csv", 
+                           start_date: str = "2023-10-25",
                            create_monthly: bool = True, 
                            create_summary: bool = True) -> None:
     """Complete temperature data preview workflow."""
@@ -239,8 +240,8 @@ def preview_temperature_data(input_file: str = "merged_data_2025.csv",
 
 if __name__ == "__main__":
     preview_temperature_data(
-        input_file="merged_data_2025.csv",
-        start_date="2024-10-25",
+        input_file="merged_data_2024.csv",
+        start_date="2023-10-25",
         create_monthly=True,
         create_summary=True
     )
