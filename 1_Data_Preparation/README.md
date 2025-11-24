@@ -126,7 +126,7 @@ The data preparation pipeline produces high-quality temperature datasets ready f
 
 ![Temperature Data Example](https://github.com/WorasitSangjan/Grow-Tube-Microclimate-Analysis/blob/main/1_Data_Preparation/images/img.png)
 
-*Temperature patterns for Plastic Low and Plastic Raise treatments showing grow tube effects from October 2024 to March 2025. Four replicates (colored lines) track closely while the ambient air temperature (dashed black line) provides reference conditions.*
+*Temperature patterns for Plastic Buried and Plastic Raised treatments showing grow tube effects from October 2024 to March 2025. Four replicates (colored lines) track closely while the ambient air temperature (dashed black line) provides reference conditions.*
 
 This visualization demonstrates the successful application of data imputation, merging, and quality validation throughout the entire workflow.
 
