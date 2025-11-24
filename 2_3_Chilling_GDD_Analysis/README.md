@@ -89,10 +89,10 @@ SEASON_TO_ANALYZE <- "2024_2025"  # Change to "2023_2024" or "2024_2025"
 ```
 
 ## Treatments
-- **Paper Low:** Paper tube at soil level
-- **Paper High:** Paper tube raised 10cm above soil
-- **Plastic Low:** Plastic tube at soil level
-- **Plastic High:** Plastic tube raised 10cm above soil
+- **Paper Buried:** Paper tube partially buried 5 cm below the soil level
+- **Paper Raised:** Paper tube raised 10cm above soil
+- **Plastic Buried:** Plastic tube partially buried 5 cm below the soil level
+- **Plastic Raised:** Plastic tube raised 10cm above soil
 - **No-Tube:** Uncovered control
 
 ## Key Outputs
