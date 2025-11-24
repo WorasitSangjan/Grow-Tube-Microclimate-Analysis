@@ -116,10 +116,10 @@ Integration of physiological and traditional thermal metrics:
 
 | Material | Installation | Code |
 |----------|-------------|------|
-| White paper | Buried  | Paper Low |
-| White paper | Raised | Paper High |
-| Beige plastic (double-wall) | Buried  | Plastic Low |
-| Beige plastic (double-wall) | Raised | Plastic High |
+| White paper | Buried  | Paper Buried |
+| White paper | Raised | Paper Rasied |
+| Beige plastic (double-wall) | Buried  | Plastic Buried |
+| Beige plastic (double-wall) | Raised | Plastic Raised |
 | None | - | No-Tube |
 
 **Cultivars:** Cabernet Sauvignon, Chardonnay, Concord, Mourvèdre
@@ -129,7 +129,7 @@ Integration of physiological and traditional thermal metrics:
 ## Key Findings
 
 ### Temperature Modifications
-- **Plastic Low** tubes produced the strongest warming (+1.5-2.0°C during sunny conditions)
+- **Plastic Buried** tubes produced the strongest warming (+1.5-2.0°C during sunny conditions)
 - **Paper tubes** showed minimal thermal modification or slight cooling
 - **Installation height** significantly affected thermal performance (buried > raised)
 - **Environmental conditions** modulated treatment effects (greatest differences during sunny, warm periods)
