@@ -190,7 +190,7 @@ def create_distribution_plots(daily_summary: pd.DataFrame, thresholds: dict) -> 
                                     patch_artist=True, notch=True)
 
         # Use different colors for seasons with visual distinction
-        for patch, season_color in zip(box_plot['boxes'], ['lightblue', 'lightcoral']):
+        for patch, season_color in zip(box_plot['boxes'], ['lightblue', 'lightblue']):
             patch.set_facecolor(season_color)
             patch.set_alpha(0.7)
 
