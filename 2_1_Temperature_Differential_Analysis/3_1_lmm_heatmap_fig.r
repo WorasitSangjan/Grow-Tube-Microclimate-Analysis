@@ -49,10 +49,10 @@ clean_heatmap_data <- function(data, variable_name) {
     mutate(
       # Clean treatment names - sentence case
       Treatment_Clean = case_when(
-        Treatment == "Paper_low" ~ "Paper\nLow",
-        Treatment == "Paper_raise" ~ "Paper\nHigh", 
-        Treatment == "Plastic_low" ~ "Plastic\nLow",
-        Treatment == "Plastic_raise" ~ "Plastic\nHigh",
+        Treatment == "Paper_low" ~ "Paper\nBuried",
+        Treatment == "Paper_raise" ~ "Paper\nRaised", 
+        Treatment == "Plastic_low" ~ "Plastic\nBuried",
+        Treatment == "Plastic_raise" ~ "Plastic\nRaised",
         TRUE ~ as.character(Treatment)
       ),
       
@@ -83,7 +83,7 @@ clean_heatmap_data <- function(data, variable_name) {
     
     # Set proper factor ordering with sentence case
     mutate(
-      Treatment_Clean = factor(Treatment_Clean, levels = c("Paper\nLow", "Paper\nHigh", "Plastic\nLow", "Plastic\nHigh")),
+      Treatment_Clean = factor(Treatment_Clean, levels = c("Paper\nBuried", "Paper\nRaised", "Plastic\nBuried", "Plastic\nRaised")),
       Time_Block_Clean = factor(Time_Block_Clean, levels = c("Morning\nWarming", "Peak\nHeat", "Afternoon\nCooling", "Night\nPeriod")),
       Thermal_Phase_Clean = factor(Thermal_Phase_Clean, levels = c("Cold Cloudy", "Cold Sunny", "Warm Cloudy", "Warm Sunny"))
     )
