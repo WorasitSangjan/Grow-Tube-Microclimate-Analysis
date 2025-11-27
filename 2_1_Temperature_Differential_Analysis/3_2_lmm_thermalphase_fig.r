@@ -47,10 +47,10 @@ prepare_figure_data <- function(data, variable_name, model_filter = "Model_1_The
     mutate(
       # Clean treatment names - sentence case
       treatment_clean = case_when(
-        Treatment == "Paper_low" ~ "Paper\nLow",
-        Treatment == "Paper_raise" ~ "Paper\nHigh", 
-        Treatment == "Plastic_low" ~ "Plastic\nLow",
-        Treatment == "Plastic_raise" ~ "Plastic\nHigh",
+        Treatment == "Paper_low" ~ "Paper\nBuried",
+        Treatment == "Paper_raise" ~ "Paper\nRaised", 
+        Treatment == "Plastic_low" ~ "Plastic\nBuried",
+        Treatment == "Plastic_raise" ~ "Plastic\nRaised",
         TRUE ~ as.character(Treatment)
       ),
       
@@ -76,7 +76,7 @@ prepare_figure_data <- function(data, variable_name, model_filter = "Model_1_The
     # Set factor levels for proper ordering
     mutate(
       treatment_clean = factor(treatment_clean, 
-                              levels = c("Paper\nLow", "Paper\nHigh", "Plastic\nLow", "Plastic\nHigh")),
+                              levels = c("Paper\nBuried", "Paper\nRaised", "Plastic\nBuried", "Plastic\nRaised")),
       thermal_phase_clean = factor(thermal_phase_clean, 
                                   levels = c("Cold Cloudy", "Cold Sunny", "Warm Cloudy", "Warm Sunny"))
     ) %>%
