@@ -47,10 +47,10 @@ prepare_timeblock_data <- function(data, variable_name, model_filter = "Model_2_
     mutate(
       # Clean treatment names - sentence case
       treatment_clean = case_when(
-        Treatment == "Paper_low" ~ "Paper\nLow",
-        Treatment == "Paper_raise" ~ "Paper\nHigh", 
-        Treatment == "Plastic_low" ~ "Plastic\nLow",
-        Treatment == "Plastic_raise" ~ "Plastic\nHigh",
+        Treatment == "Paper_low" ~ "Paper\nBuried",
+        Treatment == "Paper_raise" ~ "Paper\nRaised", 
+        Treatment == "Plastic_low" ~ "Plastic\nBuried",
+        Treatment == "Plastic_raise" ~ "Plastic\nRaised",
         TRUE ~ as.character(Treatment)
       ),
       
@@ -76,7 +76,7 @@ prepare_timeblock_data <- function(data, variable_name, model_filter = "Model_2_
     # Set factor levels for proper ordering
     mutate(
       treatment_clean = factor(treatment_clean, 
-                              levels = c("Paper\nLow", "Paper\nHigh", "Plastic\nLow", "Plastic\nHigh")),
+                              levels = c("Paper\nBuried", "Paper\nRaised", "Plastic\nBuried", "Plastic\nRaised")),
       time_block_clean = factor(time_block_clean, 
                                levels = c("Morning Warming", "Peak Heat", "Afternoon Cooling", "Night Period"))
     ) %>%
