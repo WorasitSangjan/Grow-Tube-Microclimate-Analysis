@@ -253,9 +253,9 @@ create_metric_plot <- function(data, metric_column, metric_name, y_label, title_
     #           position = position_dodge(width = 0.8), 
     #           size = 8, family = "Arial", vjust = 0, color = "black") +
     scale_fill_manual(values = treatment_colors, name = "Treatment",
-                     labels = c("Paper Low", "Paper High", "No-Tube", "Plastic Low", "Plastic High")) +
+                     labels = c("Paper Buried", "Paper Raised", "No-Tube", "Plastic Buried", "Plastic Raised")) +
     scale_color_manual(values = treatment_colors, name = "Treatment",
-                      labels = c("Paper Low", "Paper High", "No-Tube", "Plastic Low", "Plastic High")) +
+                      labels = c("Paper Buried", "Paper Raised", "No-Tube", "Plastic Buried", "Plastic Raised")) +
     scale_x_discrete(labels = c("Cabernet\nSauvignon", "Chardonnay", "Concord", "Mourvedre")) +
     labs(title = title_text, 
          x = "", 
@@ -306,9 +306,9 @@ create_traditional_gdd_plot <- function(data) {
     #           position = position_dodge(width = 0.8), 
     #           size = 8, family = "Arial", vjust = 0, color = "black") +
     scale_fill_manual(values = treatment_colors, name = "Treatment",
-                     labels = c("Paper Low", "Paper High", "No-Tube", "Plastic Low", "Plastic High")) +
+                     labels = c("Paper Buried", "Paper Raised", "No-Tube", "Plastic Buried", "Plastic Raised")) +
     scale_color_manual(values = treatment_colors, name = "Treatment",
-                      labels = c("Paper Low", "Paper High", "No-Tube", "Plastic Low", "Plastic High")) +
+                      labels = c("Paper Buried", "Paper Raised", "No-Tube", "Plastic Buried", "Plastic Raised")) +
     labs(title = "Traditional GDD", x = "", y = "GDD (°C·days)") +
     theme_minimal(base_size = 16, base_family = "Arial") +
     theme(
@@ -338,7 +338,7 @@ create_combined_plot <- function() {
   legend_plot <- ggplot(final_metrics, aes(x = Variety, y = Final_DD_Chilling, fill = Treatment)) +
     geom_boxplot() +
     scale_fill_manual(values = treatment_colors, name = "",
-                     labels = c("Paper Low", "Paper High", "No-Tube", "Plastic Low", "Plastic High")) +
+                     labels = c("Paper Buried", "Paper Raised", "No-Tube", "Plastic Buried", "Plastic Raised")) +
     theme_minimal(base_family = "Arial") +
     theme(legend.position = "bottom",
           legend.text = element_text(size = 20, family = "Arial"),
