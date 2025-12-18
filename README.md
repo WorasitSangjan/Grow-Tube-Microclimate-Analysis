@@ -10,6 +10,19 @@
 
 > **Repository for the research paper: "Grow Tube Material Selection Influences Thermal Microenvironments and Cold Hardiness Risk in Dormant Grapevines"**
 
+## Repository Structure
+
+```
+Grow-Tube-Microclimate-Analysis/
+├── 1_Data_Preparation/                     # Data preprocessing and quality control
+├── 2_1_Temperature_Differential_Analysis/  # Thermal effect quantification
+├── 2_2_Cold_Hardiness_Simulation/          # Physiological modeling
+├── 2_3_Chilling_GDD_Analysis/              # Dormancy satisfaction metrics
+├── images/                                 # Repository figures
+├── LICENSE                                 # License
+└── README.md                               # This documentation
+```
+
 ## Overview
 
 This repository contains the complete analytical workflow for studying the thermal effects of different grow tube materials and installation configurations on young grapevine microclimates during dormancy periods. The research addresses a critical knowledge gap in viticulture: understanding how grow tubes modify thermal conditions during dormancy and the potential implications for cold hardiness dynamics.
@@ -25,19 +38,6 @@ This repository contains the complete analytical workflow for studying the therm
 1. **Quantify thermal modifications** - Assess how different grow tube configurations alter internal temperatures relative to ambient conditions and no-tube controls
 2. **Model physiological risk** - Simulate cold hardiness dynamics to assess deacclimation risk across grape cultivars
 3. **Evaluate dormancy implications** - Analyze impacts on chilling unit and growing degree day accumulation
-
-## Repository Structure
-
-```
-Grow-Tube-Microclimate-Analysis/
-├── 1_Data_Preparation/                     # Data preprocessing and quality control
-├── 2_1_Temperature_Differential_Analysis/  # Thermal effect quantification
-├── 2_2_Cold_Hardiness_Simulation/          # Physiological modeling
-├── 2_3_Chilling_GDD_Analysis/              # Dormancy satisfaction metrics
-├── images/                                 # Repository figures
-├── LICENSE                                 # License
-└── README.md                               # This documentation
-```
 
 ## Analysis Pipeline
 
