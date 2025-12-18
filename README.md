@@ -197,10 +197,12 @@ Will be updated soon!
 
 **Dataset**:
 ```
-Sangjan, W., Gillispie, E. C., Schrader, M., Moyer, M. M., Shaw, M., &amp; Rippner, D. (2025). 
-Data from: Modeling Grow Tube Microclimate Effects on Vine Cold Hardiness: Identifying Beneficial 
-vs. Detrimental Thermal Modifications During Dormancy. figshare. https://doi.org/10.15482/USDA.ADC/30680408
+Sangjan, W., Gillispie, E. C., Schrader, M., Moyer, M. M., Shaw, M., & Rippner, D. (2025). Data from:
+Modeling Grow Tube Microclimate Effects on Vine Cold Hardiness: Identifying Beneficial vs. Detrimental
+Thermal Modifications During Dormancy [Data set]. Ag Data Commons. https://doi.org/10.15482/USDA.ADC/30680408
 ```
+
+[![DOI](https://img.shields.io/badge/Ag%20Data%20Commons-30680408-darkgreen.svg)](https://doi.org/10.15482/USDA.ADC/30680408)
 
 ## Contact
 
