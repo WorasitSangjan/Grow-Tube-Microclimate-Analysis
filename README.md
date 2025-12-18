@@ -184,19 +184,22 @@ Rscript 1_chilling_gdd_analysis.r
 
 ## Data Availability
 
-Raw temperature data and weather station records are available on ... (Coming Soon!)
+Raw temperature data and weather station records are available on [Ag Data Commons](https://doi.org/10.15482/USDA.ADC/30680408)
 
 ## Citation
 
-If you use this code or methodology, please cite:
+If you use this code or methodology or dataset, please cite:
 
-```bibtex
-@article{sangjan2025growtube,
-  title={Grow Tube Material Selection Influences Thermal Microenvironments and Cold Hardiness Risk in Dormant Grapevines},
-  author={Sangjan, Worasit and Gillispie, Elizabeth C. and Schrader, Mark Jake and Shaw, Madison and Moyer, Michelle M.and Rippner, Devin A.},
-  journal={In preparation},
-  year={2025}
-}
+**Paper** (coming soon):
+```
+Will be updated soon!
+```
+
+**Dataset**:
+```
+Sangjan, W., Gillispie, E. C., Schrader, M., Moyer, M. M., Shaw, M., &amp; Rippner, D. (2025). 
+Data from: Modeling Grow Tube Microclimate Effects on Vine Cold Hardiness: Identifying Beneficial 
+vs. Detrimental Thermal Modifications During Dormancy. figshare. https://doi.org/10.15482/USDA.ADC/30680408
 ```
 
 ## Contact
