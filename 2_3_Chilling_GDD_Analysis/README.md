@@ -4,7 +4,7 @@
 
 This section analyzes chilling unit accumulation and growing degree day (GDD) patterns under different grow tube treatments during dormancy. The analysis integrates physiologically relevant chilling metrics from the cold hardiness model with traditional GDD calculations to assess how grow tube configurations influence dormancy satisfaction and spring heat accumulation across grape cultivars.
 
-## Repository Structure
+## Folder Structure
 
 ```
 2_3_Chilling_GDD_Analysis/
