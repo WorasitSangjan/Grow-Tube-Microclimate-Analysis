@@ -4,7 +4,7 @@
 
 This section analyzes cold hardiness dynamics in grape cultivars under different grow tube treatments across two dormancy seasons (2023-2024 and 2024-2025). The analysis implements a dynamic physiological model to predict cultivar-specific cold hardiness responses throughout dormancy, followed by statistical comparisons to evaluate both treatment effects and genetic variation.
 
-## Repository Structure
+## Folder Structure
 
 ```
 2_2_Cold_Hardiness_Simulation/
