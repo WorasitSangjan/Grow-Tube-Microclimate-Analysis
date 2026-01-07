@@ -4,7 +4,7 @@
 
 This section contains an analysis pipeline for studying grow tube temperature effects during dormancy periods. This analysis evaluates the thermal effects of grow tube treatments relative to both internal no-tube controls (ΔTn) and external ambient conditions (ΔTa). Environmental variability during dormancy is addressed using two grouping strategies: thermal phases and time blocks.
 
-## Repository Structure
+## Folder Structure
 
 ```
 Temperature_Differential_Analysis/
